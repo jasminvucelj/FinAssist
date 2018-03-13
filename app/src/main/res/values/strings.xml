@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">FinAssist</string>
+    <string name="login_email">E-mail</string>
+    <string name="login_pass">Password</string>
+    <string name="login_signup">Sign up</string>
+    <string name="login_login">Log in</string>
+    <string name="login_passshort">The entered password is too short (minimum is %1$d characters)</string>
+    <string name="login_signupsuccess">Account successfully created!</string>
+    <string name="login_signupfailed">Failed to create new account. Verify your entered e-mail address is valid, and that you\'re connected to the Internet.</string>
+    <string name="login_empty">Both e-mail and password are required fields.</string>
+    <string name="login_authfailed">Authentication failed. Check your entered email and password, and verify you\'re connected to the Internet.</string>
+</resources>

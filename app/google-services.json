@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "1068416213061",
+    "firebase_url": "https://finassist-c1635.firebaseio.com",
+    "project_id": "finassist-c1635",
+    "storage_bucket": "finassist-c1635.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1068416213061:android:6160a70deb71c362",
+        "android_client_info": {
+          "package_name": "com.finassist"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1068416213061-418uht3f99ae107jdvtfnur50qril9n9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.finassist",
+            "certificate_hash": "9011e7e4c9cad8f908b639e1539557d70b732f56"
+          }
+        },
+        {
+          "client_id": "1068416213061-boo2r79jmuj7r9f65a9953qpot081eoh.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBsruzCjGL5KP0j06_ivc4hETceD_zB9rk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1068416213061-boo2r79jmuj7r9f65a9953qpot081eoh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
