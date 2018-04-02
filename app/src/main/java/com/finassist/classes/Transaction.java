@@ -1,22 +1,49 @@
-package com.finassist;
+package com.finassist.classes;
 
 
+import android.support.annotation.IntDef;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-class Transaction {
+public class Transaction {
+    public static final int TYPE_INCOME = 0;
+    public static final int TYPE_EXPENDITURE = 1;
+    public static final int TYPE_TRANSFER = 2;
+
+    @Retention(RetentionPolicy.SOURCE)
+    @IntDef({
+            TYPE_INCOME,
+            TYPE_EXPENDITURE,
+            TYPE_TRANSFER
+    })
+    public @interface TypeDef {}
+
+    String id;
+    int type;
     Account fromAcc, toAcc;
     Date dateTime;
     double amount;
     TransactionCategory category;
     String description;
 
-    public Transaction(Account fromAcc, Account toAcc, Date dateTime, double amount, TransactionCategory category, String description) {
+    public Transaction(@TypeDef int type, Account fromAcc, Account toAcc, Date dateTime, double amount, TransactionCategory category, String description) {
+        this.type = type;
         this.fromAcc = fromAcc;
         this.toAcc = toAcc;
         this.dateTime = dateTime;
         this.amount = amount;
         this.category = category;
         this.description = description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public Account getFromAcc() {
