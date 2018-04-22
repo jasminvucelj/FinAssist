@@ -1,4 +1,4 @@
-package com.finassist.classes;
+package com.finassist.data;
 
 
 import android.support.annotation.IntDef;
@@ -27,6 +27,8 @@ public class Transaction {
     double amount;
     TransactionCategory category;
     String description;
+
+    public Transaction() {}
 
     public Transaction(@TypeDef int type, Account fromAcc, Account toAcc, Date dateTime, double amount, TransactionCategory category, String description) {
         this.type = type;

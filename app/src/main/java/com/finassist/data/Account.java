@@ -1,10 +1,12 @@
-package com.finassist.classes;
+package com.finassist.data;
 
 
 public class Account {
     String id;
     String name;
     String description;
+
+    public Account() {};
 
     public Account(String name, String description) {
         this.name = name;

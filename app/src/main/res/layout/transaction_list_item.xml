@@ -3,8 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="4dp"
-    android:layout_marginTop="4dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginTop="8dp"
     android:orientation="vertical"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
@@ -21,10 +21,10 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.2"
-            android:gravity="center_vertical"
+            android:gravity="center"
             android:text="322.99 kn"
-            android:textAlignment="viewStart"
-            android:textSize="16sp" />
+            android:textAlignment="center"
+            android:textSize="18sp" />
 
         <LinearLayout
             android:layout_width="0dp"
@@ -47,9 +47,10 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_weight="0.25"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:text="23.12.2018. 23:59" />
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:text="23.12.2018. 23:59"
+                android:textSize="16sp" />
 
             <TextView
                 android:id="@+id/tv_category"
@@ -58,9 +59,10 @@
                 android:layout_marginBottom="2dp"
                 android:layout_marginTop="2dp"
                 android:layout_weight="0.25"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
                 android:text="TextView"
+                android:textSize="16sp"
                 tools:text="Food" />
 
         </LinearLayout>
@@ -90,7 +92,8 @@
             android:layout_weight="0.8"
             android:paddingLeft="18dp"
             android:paddingRight="18dp"
-            android:text="Visa Electron" />
+            android:text="Visa Electron"
+            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

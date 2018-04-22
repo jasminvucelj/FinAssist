@@ -23,7 +23,9 @@ import com.google.firebase.auth.FirebaseAuth;
  * The launcher activity, used for user authentication and creation of new user accounts.
  */
 public class LoginActivity extends Activity {
-    private static int MIN_PASSWORD_LENGTH = 6;
+    private static final String LOG_TAG = "LoginActivity";
+
+    private static final int MIN_PASSWORD_LENGTH = 6;
 
     private FirebaseAuth mAuth;
 
@@ -31,7 +33,7 @@ public class LoginActivity extends Activity {
 
     private Button btnLogin, btnSignUp;
     private EditText etEmail, etPassword;
-    private TextView tvError;
+    // private TextView tvError;
     private ProgressBar progressBar;
 
     @Override
@@ -43,13 +45,14 @@ public class LoginActivity extends Activity {
         btnSignUp = findViewById(R.id.btnSignUp);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        tvError = findViewById(R.id.tvError);
-        progressBar = findViewById(R.id.progressBar);
+        // tvError = findViewById(R.id.tvError);
+        progressBar = findViewById(R.id.progress_bar);
+
+        // etEmail.setText(""); // TEST
+        // etPassword.setText(""); // TEST
 
         //Get Firebase auth instance
         mAuth = FirebaseAuth.getInstance();
-
-        // TODO replace textview error messages with toasts
 
         /*
          btnLogin - try to authenticate the user with given email & password
@@ -61,12 +64,12 @@ public class LoginActivity extends Activity {
                 password = etPassword.getText().toString();
 
                 if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                    tvError.setText(getString(R.string.login_empty));
+                    showError(getString(R.string.login_empty));
                     return;
                 }
 
                 if (password.length() < MIN_PASSWORD_LENGTH) {
-                    tvError.setText(String.format(getString(R.string.login_passshort), MIN_PASSWORD_LENGTH));
+                    showError(String.format(getString(R.string.login_passshort), MIN_PASSWORD_LENGTH));
                     return;
                 }
 
@@ -80,7 +83,7 @@ public class LoginActivity extends Activity {
                                 progressBar.setVisibility(View.GONE);
 
                                 if (!task.isSuccessful()) { // there was an error
-                                    tvError.setText(getString(R.string.login_authfailed));
+                                    showError(getString(R.string.login_authfailed));
                                 } else { // start main activity
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                     finish();
@@ -103,12 +106,12 @@ public class LoginActivity extends Activity {
                 // validate email and password fields
 
                 if (TextUtils.isEmpty(email) || TextUtils.isEmpty(password)) {
-                    tvError.setText(getString(R.string.login_empty));
+                    showError(getString(R.string.login_empty));
                     return;
                 }
 
                 if (password.length() < MIN_PASSWORD_LENGTH) {
-                    tvError.setText(String.format(getString(R.string.login_passshort), MIN_PASSWORD_LENGTH));
+                    showError(String.format(getString(R.string.login_passshort), MIN_PASSWORD_LENGTH));
                     return;
                 }
 
@@ -122,7 +125,7 @@ public class LoginActivity extends Activity {
                                 progressBar.setVisibility(View.GONE);
 
                                 if (!task.isSuccessful()) { // there was an error
-                                    tvError.setText(getString(R.string.login_signupfailed));
+                                    showError(getString(R.string.login_signupfailed));
                                 } else { // inform user of success, start main activity
                                     Toast.makeText(LoginActivity.this, getString(R.string.login_signupsuccess), Toast.LENGTH_SHORT).show();
                                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
@@ -142,7 +145,7 @@ public class LoginActivity extends Activity {
         super.onSaveInstanceState(outState);
         outState.putString("email", etEmail.getText().toString());
         outState.putString("password", etPassword.getText().toString());
-        outState.putString("error", tvError.getText().toString());
+        // outState.putString("error", tvError.getText().toString());
     }
 
 
@@ -151,8 +154,13 @@ public class LoginActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
         etEmail.setText(savedInstanceState.getString("email"));
         etPassword.setText(savedInstanceState.getString("password"));
-        tvError.setText(savedInstanceState.getString("error"));
+        //tvError.setText(savedInstanceState.getString("error"));
     }
 
+
+    private void showError(String errorText) {
+        // tvError.setText(getString(R.string.login_signupfailed));
+        Toast.makeText(this, errorText, Toast.LENGTH_LONG).show();
+    }
 
 }

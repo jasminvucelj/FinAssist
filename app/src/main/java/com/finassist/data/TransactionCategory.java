@@ -1,10 +1,12 @@
-package com.finassist.classes;
+package com.finassist.data;
 
 
 public class TransactionCategory {
     String id = null;
     String name;
     TransactionCategory parent = null;
+
+    public TransactionCategory() {}
 
     public TransactionCategory(String name) {
         this.name = name;
