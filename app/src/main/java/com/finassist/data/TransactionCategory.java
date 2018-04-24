@@ -1,7 +1,9 @@
 package com.finassist.data;
 
 
-public class TransactionCategory {
+import java.io.Serializable;
+
+public class TransactionCategory implements Serializable {
     String id = null;
     String name;
     TransactionCategory parent = null;

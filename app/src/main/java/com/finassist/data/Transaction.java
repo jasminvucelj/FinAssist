@@ -3,11 +3,12 @@ package com.finassist.data;
 
 import android.support.annotation.IntDef;
 
+import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
-public class Transaction {
+public class Transaction implements Serializable {
     public static final int TYPE_INCOME = 0;
     public static final int TYPE_EXPENDITURE = 1;
     public static final int TYPE_TRANSFER = 2;

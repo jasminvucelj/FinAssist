@@ -9,4 +9,11 @@
     <string name="login_signupfailed">Failed to create new account. Verify your entered e-mail address is valid, and that you\'re connected to the Internet.</string>
     <string name="login_empty">Both e-mail and password are required fields.</string>
     <string name="login_authfailed">Authentication failed. Check your entered email and password, and verify you\'re connected to the Internet.</string>
+    <string name="transaction_your_account">Your account:</string>
+    <string name="transaction_type">Transaction type:</string>
+    <string name="transaction_category">Transaction category:</string>
+    <string name="transaction_amount">Amount:</string>
+    <string name="transaction_accept">Accept</string>
+    <string name="transaction_cancel">Cancel</string>
+    <string name="transaction_description">Description:</string>
 </resources>

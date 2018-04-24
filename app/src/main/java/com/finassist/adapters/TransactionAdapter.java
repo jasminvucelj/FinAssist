@@ -15,7 +15,12 @@ import java.util.List;
 
 
 public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.ViewHolder> {
-    private List<Transaction> mDataset;
+    private final List<Transaction> mDataset;
+    private final TransactionAdapterOnClickHandler clickHandler;
+
+    public interface TransactionAdapterOnClickHandler {
+        void onClick(Transaction transaction);
+    }
 
     // Provide a reference to the views for each data item
     // Complex data items may need more than one view per item, and
@@ -39,8 +44,9 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
     }
 
     // Provide a suitable constructor (depends on the kind of dataset)
-    public TransactionAdapter(List<Transaction> dataset) {
+    public TransactionAdapter(List<Transaction> dataset, TransactionAdapterOnClickHandler clickHandler) {
         mDataset = dataset;
+        this.clickHandler = clickHandler;
     }
 
     // Create new views (invoked by the layout manager)
@@ -63,7 +69,7 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         Transaction transaction = mDataset.get(position);
 
         holder.tvAmount.setText(String.format("%.2f", transaction.getAmount()) + " kn");
-        holder.tvDescription.setText(transaction.getDescription());
+        holder.tvDescription.setText(transaction.getDescription()); // TODO no desc?
         SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         holder.tvDate.setText(sdf.format(transaction.getDateTime()));
         holder.tvCategory.setText(transaction.getCategory().toString());

@@ -1,7 +1,9 @@
 package com.finassist.data;
 
 
-public class Account {
+import java.io.Serializable;
+
+public class Account implements Serializable {
     String id;
     String name;
     String description;

@@ -1,6 +1,7 @@
 package com.finassist.activities;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,9 +24,13 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity
+        implements TransactionAdapter.TransactionAdapterOnClickHandler {
 
-    private static String LOG_TAG = "MainActivity";
+    private static final String LOG_TAG = "MainActivity";
+
+    public static final int TRANSACTION_CREATE_REQUEST_CODE = 10;
+    public static final int TRANSACTION_EDIT_REQUEST_CODE = 11;
 
     private RecyclerView rvTransactions;
     private ProgressBar progressBar;
@@ -34,8 +39,6 @@ public class MainActivity extends Activity {
 
 
     private final List<Transaction> transactionList = new ArrayList<>();
-    //FirebaseDatabaseHelper fdc = new FirebaseDatabaseHelper();
-    //List<Transaction> transactionList = fdc.readTransactions(currentUserId);
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     final DatabaseReference dbTransactions = database.getReference("transactions");
@@ -87,6 +90,14 @@ public class MainActivity extends Activity {
 
     }
 
+    @Override
+    public void onClick(Transaction transaction) {
+        Intent intent = new Intent (this, EditTransactionActivity.class);
+        intent.putExtra("transaction", transaction);
+        intent.putExtra("request_code", TRANSACTION_EDIT_REQUEST_CODE);
+        startActivityForResult(intent, TRANSACTION_EDIT_REQUEST_CODE);
+    }
+
 
     /**
      * Binds the transaction data to an adapter, and then to the RecyclerView, and shows the RecyclerView,
@@ -94,14 +105,12 @@ public class MainActivity extends Activity {
      */
     private void setupRecyclerView() {
         if (!transactionList.isEmpty()) {
-            TransactionAdapter transactionAdapter = new TransactionAdapter(transactionList);
-            Toast.makeText(this, "Populating RV + " +
-                    String.valueOf(transactionAdapter.getItemCount()), Toast.LENGTH_LONG).show();
+            TransactionAdapter transactionAdapter = new TransactionAdapter(transactionList,
+                    MainActivity.this);
             rvTransactions.setAdapter(transactionAdapter);
             rvTransactions.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
         }
     }
-
 
 }
