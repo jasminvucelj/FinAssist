@@ -29,11 +29,21 @@ public class FirebaseDatabaseHelper {
     }
 
 
+	public static void saveTransaction(Transaction transaction, String userId, String objectId) {
+		dbTransactions.child(userId).child(objectId).setValue(transaction);
+	}
+
+
     public static void saveAccount(Account account, String userId) {
         String objectId = dbAccounts.child(userId).push().getKey();
         account.setId(objectId);
         dbAccounts.child(userId).child(objectId).setValue(account);
     }
+
+
+	public static void saveAccount(Account account, String userId, String objectId) {
+		dbAccounts.child(userId).child(objectId).setValue(account);
+	}
 
 
     public static void saveDummyAccount(Account account, String userId) {
@@ -49,5 +59,13 @@ public class FirebaseDatabaseHelper {
         dbTransactionCategories.child(userId).child(objectId).setValue(transactionCategory);
     }
 
+
+	public static void saveTransactionCategory(TransactionCategory transactionCategory,
+											   String userId,
+											   String objectId) {
+		dbTransactionCategories.child(userId).child(objectId).setValue(transactionCategory);
+	}
+
     //endregion
+
 }

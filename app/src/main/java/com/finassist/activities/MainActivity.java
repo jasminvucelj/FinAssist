@@ -24,6 +24,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+
 public class MainActivity extends Activity
         implements TransactionAdapter.TransactionAdapterOnClickHandler {
 
@@ -32,16 +34,18 @@ public class MainActivity extends Activity
     public static final int TRANSACTION_CREATE_REQUEST_CODE = 10;
     public static final int TRANSACTION_EDIT_REQUEST_CODE = 11;
 
-    private RecyclerView rvTransactions;
-    private ProgressBar progressBar;
+    @BindView(R.id.rv_transactions) RecyclerView rvTransactions;
+    @BindView(R.id.progress_bar) ProgressBar progressBar;
 
     private String currentUserId;
 
+    private List<Transaction> transactionList = new ArrayList<>();
 
-    private final List<Transaction> transactionList = new ArrayList<>();
-
-    final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    final DatabaseReference dbTransactions = database.getReference("transactions");
+    public static final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    public static final DatabaseReference dbTransactions = database.getReference("transactions");
+	public static final DatabaseReference dbAccounts = database.getReference("accounts");
+	public static final DatabaseReference dbDummyAccounts = database.getReference("dummy_accounts");
+	public static final DatabaseReference dbTransactionCategories = database.getReference("transaction_categories");
 
 
     @Override
@@ -65,25 +69,13 @@ public class MainActivity extends Activity
             e.printStackTrace();
         }
 
-        // TODO move data fetching to FirebaseDatabaseHelper!
+        // TODO move data fetching to FirebaseDatabaseHelper?
 
-        dbTransactions.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-                    transactionList.add(childSnapshot.getValue(Transaction.class));
-                }
+		fetchTransactions();
 
-                setupRecyclerView();
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
 
         // TODO recyclerView click -> editTransaction
+
         // TODO recyclerView swipe L/R to delete
         // TODO toolbar edit accounts, options
 
@@ -94,9 +86,30 @@ public class MainActivity extends Activity
     public void onClick(Transaction transaction) {
         Intent intent = new Intent (this, EditTransactionActivity.class);
         intent.putExtra("transaction", transaction);
+        intent.putExtra("user_id", currentUserId);
         intent.putExtra("request_code", TRANSACTION_EDIT_REQUEST_CODE);
         startActivityForResult(intent, TRANSACTION_EDIT_REQUEST_CODE);
     }
+
+
+    public void fetchTransactions() {
+		dbTransactions.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				transactionList = new ArrayList<>();
+				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+					transactionList.add(childSnapshot.getValue(Transaction.class));
+				}
+
+				setupRecyclerView();
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+	}
 
 
     /**
@@ -113,4 +126,11 @@ public class MainActivity extends Activity
         }
     }
 
+
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		fetchTransactions();
+		setupRecyclerView();
+	}
 }

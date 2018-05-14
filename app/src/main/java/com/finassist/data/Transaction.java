@@ -8,21 +8,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
 
+
 public class Transaction implements Serializable {
-    public static final int TYPE_INCOME = 0;
+
+	public static final int TYPE_INCOME = 0;
     public static final int TYPE_EXPENDITURE = 1;
     public static final int TYPE_TRANSFER = 2;
 
+    public static final Integer[] typeArray = {TYPE_INCOME, TYPE_EXPENDITURE, TYPE_TRANSFER};
+
+    /*
     @Retention(RetentionPolicy.SOURCE)
-    @IntDef({
-            TYPE_INCOME,
-            TYPE_EXPENDITURE,
-            TYPE_TRANSFER
-    })
+    @IntDef(value = {TYPE_INCOME, TYPE_EXPENDITURE, TYPE_TRANSFER})
     public @interface TypeDef {}
+    */
 
     String id;
-    int type;
+    int type; // TODO enum
     Account fromAcc, toAcc;
     Date dateTime;
     double amount;
@@ -31,7 +33,7 @@ public class Transaction implements Serializable {
 
     public Transaction() {}
 
-    public Transaction(@TypeDef int type, Account fromAcc, Account toAcc, Date dateTime, double amount, TransactionCategory category, String description) {
+    public Transaction(int type, Account fromAcc, Account toAcc, Date dateTime, double amount, TransactionCategory category, String description) {
         this.type = type;
         this.fromAcc = fromAcc;
         this.toAcc = toAcc;
@@ -48,6 +50,14 @@ public class Transaction implements Serializable {
     public void setId(String id) {
         this.id = id;
     }
+
+    public int getType() {
+    	return type;
+	}
+
+	public void setType(int type) {
+    	this.type = type;
+	}
 
     public Account getFromAcc() {
         return fromAcc;
@@ -95,5 +105,46 @@ public class Transaction implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Account getOtherOrFromAccount() {
+    	if(type == TYPE_EXPENDITURE) return toAcc;
+    	return fromAcc; // returns fromAcc in case of TYPE_TRANSFER!
+	}
+
+	public Account getOtherOrToAccount() {
+		if(type == TYPE_INCOME) return fromAcc;
+		return toAcc; // returns toAcc in case of TYPE_TRANSFER!
+	}
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Transaction that = (Transaction) o;
+
+        if (type != that.type) return false;
+        if (Double.compare(that.amount, amount) != 0) return false;
+        if (!fromAcc.equals(that.fromAcc)) return false;
+        if (!toAcc.equals(that.toAcc)) return false;
+        if (!dateTime.equals(that.dateTime)) return false;
+        if (!category.equals(that.category)) return false;
+        return description != null ? description.equals(that.description) : that.description == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result;
+        long temp;
+        result = type;
+        result = 31 * result + fromAcc.hashCode();
+        result = 31 * result + toAcc.hashCode();
+        result = 31 * result + dateTime.hashCode();
+        temp = Double.doubleToLongBits(amount);
+        result = 31 * result + (int) (temp ^ (temp >>> 32));
+        result = 31 * result + category.hashCode();
+        result = 31 * result + (description != null ? description.hashCode() : 0);
+        return result;
     }
 }
