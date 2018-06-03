@@ -6,10 +6,10 @@
     android:layout_height="match_parent"
     android:layout_margin="16dp"
     android:orientation="vertical"
-    tools:context="com.finassist.activities.EditTransactionActivity">
+    tools:context="com.finassist.activities.TransactionEditActivity">
 
     <TextView
-        android:id="@+id/tvYourAccount"
+        android:id="@+id/tvFirstAccount"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.05"
@@ -19,23 +19,56 @@
         android:text="@string/transaction_your_account" />
 
     <LinearLayout
+        android:id="@+id/llFirstAccount"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.1"
         android:orientation="horizontal">
 
         <Spinner
-            android:id="@+id/spinnerAccount"
+            android:id="@+id/spinnerFirstAccount"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.9" />
+            android:layout_weight="0.85" />
 
         <ImageButton
             android:id="@+id/ibAddAccount"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="0.15"
-            android:src="@android:drawable/ic_menu_add" />
+            android:src="@drawable/ic_accounts" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/tvSecondAccount"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.05"
+        android:gravity="center_vertical"
+        android:paddingLeft="4dp"
+        android:paddingRight="4dp"
+        android:text="@string/transaction_to_account"
+        android:visibility="gone" />
+
+    <LinearLayout
+        android:id="@+id/llSecondAccount"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.1"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <Spinner
+            android:id="@+id/spinnerSecondAccount"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="0.9" />
+
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15" />
+
     </LinearLayout>
 
     <TextView
@@ -58,14 +91,13 @@
             android:id="@+id/spinnerCategory"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:layout_weight="0.9" />
+            android:layout_weight="0.85" />
 
-        <ImageButton
-            android:id="@+id/ibAddCategory"
-            android:layout_width="0dp"
+        <Space
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:layout_weight="0.15"
-            android:src="@android:drawable/ic_menu_add" />
+            android:layout_weight="0.15" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -77,8 +109,9 @@
         <TextView
             android:id="@+id/tvType"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.5"
+            android:gravity="center_vertical"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             android:text="@string/transaction_type" />
@@ -89,12 +122,11 @@
             android:layout_height="match_parent"
             android:layout_weight="0.35" />
 
-        <ImageButton
-            android:id="@+id/ibAddType"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.15"
-            android:src="@android:drawable/ic_menu_add" />
+        <Space
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="0.15" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -106,8 +138,9 @@
         <TextView
             android:id="@+id/tvAmount"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="0.5"
+            android:gravity="center_vertical"
             android:paddingLeft="4dp"
             android:paddingRight="4dp"
             android:text="@string/transaction_amount" />
@@ -130,20 +163,21 @@
         android:gravity="center_vertical"
         android:paddingLeft="4dp"
         android:paddingRight="4dp"
-        android:text="@string/transaction_description" />
+        android:text="@string/general_description_optional" />
 
     <EditText
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.05"
+        android:layout_weight="0.1"
         android:ems="10"
-        android:inputType="textMultiLine" />
+        android:inputType="text"
+        android:maxLines="1" />
 
     <Space
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="0.2" />
+        android:layout_weight="0.15" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -156,14 +190,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/transaction_accept" />
+            android:text="@string/dialog_accept" />
 
         <Button
             android:id="@+id/btnCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="@string/transaction_cancel" />
+            android:text="@string/dialog_cancel" />
     </LinearLayout>
 
 </LinearLayout>

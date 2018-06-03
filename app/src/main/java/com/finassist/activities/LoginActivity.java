@@ -1,5 +1,6 @@
 package com.finassist.activities;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -9,7 +10,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.finassist.R;
@@ -36,6 +36,7 @@ public class LoginActivity extends Activity {
     // private TextView tvError;
     private ProgressBar progressBar;
 
+    @SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,8 +49,7 @@ public class LoginActivity extends Activity {
         // tvError = findViewById(R.id.tvError);
         progressBar = findViewById(R.id.progress_bar);
 
-        // etEmail.setText(""); // TEST
-        // etPassword.setText(""); // TEST
+        autoLogin();
 
         //Get Firebase auth instance
         mAuth = FirebaseAuth.getInstance();
@@ -85,7 +85,7 @@ public class LoginActivity extends Activity {
                                 if (!task.isSuccessful()) { // there was an error
                                     showError(getString(R.string.login_authfailed));
                                 } else { // start main activity
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                     finish();
                                 }
                             }
@@ -128,7 +128,7 @@ public class LoginActivity extends Activity {
                                     showError(getString(R.string.login_signupfailed));
                                 } else { // inform user of success, start main activity
                                     Toast.makeText(LoginActivity.this, getString(R.string.login_signupsuccess), Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                                    startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                                     finish();
                                 }
                             }
@@ -139,13 +139,17 @@ public class LoginActivity extends Activity {
 
     }
 
+    private void autoLogin() {
+        etEmail.setText("jasminvucelj1@gmail.com"); // TEST
+        etPassword.setText("jasv49"); // TEST
+    }
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putString("email", etEmail.getText().toString());
         outState.putString("password", etPassword.getText().toString());
-        // outState.putString("error", tvError.getText().toString());
     }
 
 
@@ -154,12 +158,10 @@ public class LoginActivity extends Activity {
         super.onRestoreInstanceState(savedInstanceState);
         etEmail.setText(savedInstanceState.getString("email"));
         etPassword.setText(savedInstanceState.getString("password"));
-        //tvError.setText(savedInstanceState.getString("error"));
     }
 
 
     private void showError(String errorText) {
-        // tvError.setText(getString(R.string.login_signupfailed));
         Toast.makeText(this, errorText, Toast.LENGTH_LONG).show();
     }
 

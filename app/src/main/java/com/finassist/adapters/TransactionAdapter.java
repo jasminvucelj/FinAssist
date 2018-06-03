@@ -1,6 +1,8 @@
 package com.finassist.adapters;
 
 import android.annotation.SuppressLint;
+import android.content.res.Resources;
+import android.graphics.Color;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -50,21 +52,40 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
         Transaction transaction = transactionList.get(position);
 
         holder.tvAmount.setText(String.format("%.2f", transaction.getAmount()) + " kn");
-        holder.tvDescription.setText(transaction.getDescription());
-        SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
+
+        String description = transaction.getDescription();
+        if(description == null || !(description.trim().length() > 0)) {
+        	if(transaction.getType() == Transaction.TYPE_TRANSFER) {
+        		description = "Transfer (" + transaction.transferAccountsToString() + ")";
+			}
+			else {
+        		description = "(" + transaction.getCategory().toString() + ")";
+			}
+		}
+		holder.tvDescription.setText(description);
+
+
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yyyy HH:mm");
         holder.tvDate.setText(sdf.format(transaction.getDateTime()));
         holder.tvCategory.setText(transaction.getCategory().toString());
 
         if (transaction.getType() == Transaction.TYPE_INCOME) {
+        	holder.tvAmount.setTextColor(
+        			Resources.getSystem().getColor(android.R.color.holo_green_dark));
 			holder.tvAccount.setText(transaction.getToAcc().getName());
+			holder.ivType.setImageResource(R.drawable.ic_income);
 		}
 		else if(transaction.getType() == Transaction.TYPE_EXPENDITURE) {
+			holder.tvAmount.setTextColor(
+					Resources.getSystem().getColor(android.R.color.holo_red_dark));
 			holder.tvAccount.setText(transaction.getFromAcc().getName());
+			holder.ivType.setImageResource(R.drawable.ic_expenditure);
 		}
-
-		// TODO transfer
-
-        // holder.ivType.setImageDrawable(); TODO
+		else {
+			holder.tvAmount.setTextColor(Resources.getSystem().getColor(android.R.color.black));
+			holder.tvAccount.setText(transaction.transferAccountsToString());
+			holder.ivType.setImageResource(R.drawable.ic_transfer);
+		}
 
     }
 
@@ -78,14 +99,14 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 	// Provide a reference to the views for each data item
 	// Complex data items may need more than one view per item, and
 	// you provide access to all the views for a data item in a view holder
-	public class TransactionViewHolder extends RecyclerView.ViewHolder
+	class TransactionViewHolder extends RecyclerView.ViewHolder
 			/* implements View.OnClickListener */ {
 
     	TextView tvAmount, tvDescription, tvDate, tvCategory, tvAccount;
 		ImageView ivType;
 
 		@SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
-		public TransactionViewHolder(View itemView) {
+		TransactionViewHolder(View itemView) {
 			super(itemView);
 			itemView.setClickable(true);
 			itemView.setOnClickListener(new View.OnClickListener() {
@@ -105,12 +126,5 @@ public class TransactionAdapter extends RecyclerView.Adapter<TransactionAdapter.
 
 		}
 
-		/*
-		@Override
-		public void onClick(View v) {
-			Transaction transaction = transactionList.get(getAdapterPosition());
-			clickHandler.onClick(transaction);
-		}
-		*/
 	}
 }

@@ -23,13 +23,13 @@ public class Transaction implements Serializable {
     public @interface TypeDef {}
     */
 
-    String id;
-    int type; // TODO enum
-    Account fromAcc, toAcc;
-    Date dateTime;
-    double amount;
-    TransactionCategory category;
-    String description;
+    private String id = null;
+	private int type;
+	private Account fromAcc, toAcc;
+	private Date dateTime;
+	private double amount;
+	private TransactionCategory category;
+	private String description;
 
     public Transaction() {}
 
@@ -107,14 +107,9 @@ public class Transaction implements Serializable {
         this.description = description;
     }
 
-    public Account getOtherOrFromAccount() {
-    	if(type == TYPE_EXPENDITURE) return toAcc;
-    	return fromAcc; // returns fromAcc in case of TYPE_TRANSFER!
-	}
-
-	public Account getOtherOrToAccount() {
-		if(type == TYPE_INCOME) return fromAcc;
-		return toAcc; // returns toAcc in case of TYPE_TRANSFER!
+    public String transferAccountsToString() {
+    	if(type != TYPE_TRANSFER) return "";
+    	return fromAcc.getName() + " -> " + toAcc.getName();
 	}
 
     @Override

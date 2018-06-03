@@ -4,9 +4,9 @@ package com.finassist.data;
 import java.io.Serializable;
 
 public class TransactionCategory implements Serializable {
-    String id = null;
-    String name;
-    TransactionCategory parent = null;
+    private String id = null;
+    private String name;
+    private TransactionCategory parent = null;
 
     public TransactionCategory() {}
 
@@ -63,7 +63,6 @@ public class TransactionCategory implements Serializable {
 
 	@Override
     public String toString() {
-        // TODO test!
         if (parent == null) {
             return name;
         }

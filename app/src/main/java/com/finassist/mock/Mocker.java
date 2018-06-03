@@ -13,11 +13,11 @@ import java.util.Locale;
 
 public class Mocker {
 
-    private void generateMockUserData(String currentUserId) {
+    public static void generateMockUserData(String currentUserId) {
 
-        Account account0 = new Account("DUMMY_EXPENDITURE_ACC", "");
-        Account account1 = new Account("Visa Electron", "Zaba žiro račun");
-        Account account2 = new Account("Gotovina", "");
+        Account account0 = new Account("DUMMY_EXPENDITURE_ACC", "", 0);
+        Account account1 = new Account("Visa Electron", "Zaba žiro račun",7000);
+        Account account2 = new Account("Maestro", "", 2500);
 
         SimpleDateFormat sdf = new SimpleDateFormat(
                 "dd.MM.yyyy. HH:mm:ss",

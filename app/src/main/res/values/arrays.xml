@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string-array name="options_labels">
+    <string-array name="type_labels">
         <item>Income</item>
         <item>Expenditure</item>
         <item>Transfer</item>
     </string-array>
-    <integer-array name="options_values">
+    <integer-array name="type_values">
         <item>0</item>
         <item>1</item>
         <item>2</item>

@@ -9,11 +9,11 @@ import com.google.firebase.database.FirebaseDatabase;
 
 
 public class FirebaseDatabaseHelper {
-    private static final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private static final DatabaseReference dbAccounts = database.getReference("accounts");
-    private static final DatabaseReference dbDummyAccounts = database.getReference("dummy_accounts");
-    private static final DatabaseReference dbTransactionCategories = database.getReference("transaction_categories");
-    private static final DatabaseReference dbTransactions = database.getReference("transactions");
+    public static final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    public static final DatabaseReference dbAccounts = database.getReference("accounts");
+    public static final DatabaseReference dbDummyAccounts = database.getReference("dummy_accounts");
+    public static final DatabaseReference dbTransactionCategories = database.getReference("transaction_categories");
+    public static final DatabaseReference dbTransactions = database.getReference("transactions");
 
 
     public static String getCustomUserId(FirebaseUser user) throws NullPointerException {
@@ -67,5 +67,17 @@ public class FirebaseDatabaseHelper {
 	}
 
     //endregion
+
+	// region DELETE
+
+	public static void deleteTransaction(Transaction transaction, String userId) {
+		dbTransactions.child(userId).child(transaction.getId()).removeValue(); // TODO change account balances!
+	}
+
+	public static void deleteAccount(Account account, String userId) { // TODO also delete transactions!
+		dbAccounts.child(userId).child(account.getId()).removeValue();
+	}
+
+	// endregion
 
 }
