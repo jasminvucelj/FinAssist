@@ -9,6 +9,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.View;
 import android.widget.ProgressBar;
@@ -47,6 +48,8 @@ public class AccountOverviewActivity extends Activity
 	public static final int ACCOUNT_CREATE_REQUEST_CODE = 10;
 	public static final int ACCOUNT_EDIT_REQUEST_CODE = 11;
 
+	@BindView(R.id.toolbar)
+	Toolbar toolbar;
 	@BindView(R.id.rv_accounts)
 	RecyclerView rvAccounts;
 	@BindView(R.id.progress_bar)
@@ -94,6 +97,13 @@ public class AccountOverviewActivity extends Activity
 				intent.putExtra("user_id", currentUserId);
 				intent.putExtra("request_code", ACCOUNT_CREATE_REQUEST_CODE);
 				startActivityForResult(intent, ACCOUNT_CREATE_REQUEST_CODE);
+			}
+		});
+
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
 			}
 		});
 

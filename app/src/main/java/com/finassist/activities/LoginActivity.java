@@ -139,9 +139,9 @@ public class LoginActivity extends Activity {
 
     }
 
-    private void autoLogin() {
+    private void autoLogin() { // TEST
         etEmail.setText("jasminvucelj1@gmail.com"); // TEST
-        etPassword.setText("jasv49"); // TEST
+        etPassword.setText("jasmin49"); // TEST
     }
 
 

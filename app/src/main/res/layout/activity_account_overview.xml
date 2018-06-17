@@ -14,7 +14,7 @@
         android:layout_gravity="end|bottom"
         android:layout_margin="20dp"
         android:src="@drawable/add_icon"
-        app:backgroundTint="@color/colorPrimary"
+        app:backgroundTint="#ffd3dadb"
         app:elevation="12dp"
         app:fabSize="normal" />
 
@@ -22,6 +22,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
+
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#ffb7c3c5"
+            android:minHeight="?attr/actionBarSize"
+            android:theme="?attr/actionBarTheme"
+            app:navigationIcon="?attr/homeAsUpIndicator"
+            app:title="Accounts overview" />
 
         <TextView
             android:id="@+id/tv_message"

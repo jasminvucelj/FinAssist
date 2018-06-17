@@ -54,6 +54,17 @@ public class Account implements Serializable {
         return name;
     }
 
+    public Account clone() {
+    	Account newAccount = new Account();
+
+    	newAccount.id = this.id;
+		newAccount.name = this.name;
+		newAccount.description = this.description;
+		newAccount.balance = this.balance;
+
+		return newAccount;
+	}
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <declare-styleable name="TransactionView">
+        <attr name="amount" format="string" />
+        <attr name="description" format="string" />
+        <attr name="date" format="string" />
+        <attr name="category" format="string" />
+        <attr name="account" format="string" />
+        <attr name="image" format="reference" />
+
+        <attr name="android:ems" />
+
+    </declare-styleable>
+</resources>

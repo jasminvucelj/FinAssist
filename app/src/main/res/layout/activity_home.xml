@@ -7,11 +7,84 @@
     android:orientation="vertical"
     tools:context=".activities.HomeActivity">
 
-    <LinearLayout
-        android:id="@+id/llSpotlight"
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#ffb7c3c5"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:title="Welcome to FinAssist!" />
+
+    <RelativeLayout
+        android:id="@+id/rlSpotlight"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.5"
+        android:paddingBottom="8dp"
+        android:paddingLeft="12dp"
+        android:paddingRight="12dp"
+        android:paddingTop="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="right"
+            android:orientation="vertical">
+
+            <TextView
+                android:id="@+id/tvLastTransaction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:layout_marginLeft="56dp"
+                android:layout_marginRight="56dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/menu_spotlight_last_transaction" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.25" />
+
+                <com.finassist.views.TransactionView
+                    android:id="@+id/lastTransactionSpotlight"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="0.75"
+                    app:account="@string/test_transaction_account"
+                    app:amount="@string/test_transaction_amount"
+                    app:category="@string/test_transaction_category"
+                    app:date="@string/test_transaction_date"
+                    app:description="@string/test_transaction_description"
+                    app:image="@android:drawable/presence_video_busy" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/spotlightChart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="24dp"
+            android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginTop="24dp">
+
+        </com.github.mikephil.charting.charts.LineChart>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:id="@+id/llSpotlightOld"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0"
         android:orientation="vertical"
         android:paddingBottom="12dp"
         android:paddingLeft="24dp"
@@ -23,13 +96,6 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvWelcome"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Welcome, user!" />
 
             <LinearLayout
                 android:layout_width="match_parent"

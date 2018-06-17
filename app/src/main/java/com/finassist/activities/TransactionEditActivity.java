@@ -4,12 +4,14 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.Adapter;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -29,6 +31,8 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
+import butterknife.OnFocusChange;
 
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbDummyAccounts;
@@ -47,18 +51,74 @@ public class TransactionEditActivity extends Activity {
     private List<Account> accountList;
     private List<TransactionCategory> transactionCategoryList;
 
-	@BindView(R.id.tvFirstAccount) TextView tvFirstAccount;
-	@BindView(R.id.spinnerFirstAccount) Spinner spinnerFirstAccount;
-	@BindView(R.id.tvSecondAccount) TextView tvSecondAccount;
-	@BindView(R.id.llSecondAccount) LinearLayout llSecondAccount;
-	@BindView(R.id.spinnerSecondAccount) Spinner spinnerSecondAccount;
-	@BindView(R.id.spinnerCategory) Spinner spinnerCategory;
-	@BindView(R.id.spinnerType) Spinner spinnerType;
-	@BindView(R.id.etAmount) EditText etAmount;
-	@BindView(R.id.etDescription) EditText etDescription;
+    @BindView(R.id.toolbar)
+	Toolbar toolbar;
 
-	@BindView(R.id.btnAccept) Button btnAccept;
-	@BindView(R.id.btnCancel) Button btnCancel;
+	@BindView(R.id.tvFirstAccount)
+	TextView tvFirstAccount;
+	@BindView(R.id.spinnerFirstAccount)
+	Spinner spinnerFirstAccount;
+	@BindView(R.id.ibAccounts)
+	ImageButton ibAddAccount;
+
+	@BindView(R.id.tvSecondAccount)
+	TextView tvSecondAccount;
+	@BindView(R.id.llSecondAccount)
+	LinearLayout llSecondAccount;
+	@BindView(R.id.spinnerSecondAccount)
+	Spinner spinnerSecondAccount;
+
+	@BindView(R.id.spinnerCategory)
+	Spinner spinnerCategory;
+	@BindView(R.id.spinnerType)
+	Spinner spinnerType;
+
+	@BindView(R.id.etAmount)
+	EditText etAmount;
+	@BindView(R.id.etAccountDescription)
+	EditText etDescription;
+
+	@BindView(R.id.btnAccept)
+	Button btnAccept;
+	@BindView(R.id.btnCancel)
+	Button btnCancel;
+
+	// etAmount - when focus is lost, format number properly
+	@OnFocusChange(R.id.etAmount)
+	public void etAmount_onFocusChange(boolean hasFocus) {
+		if(!hasFocus) {
+			double amount = Double.parseDouble(etAmount.getText().toString());
+			etAmount.setText(new DecimalFormat("#.00").format(amount));
+		}
+	}
+
+	// ibAddAccount - starts the account overview activity.
+	@OnClick(R.id.ibAccounts)
+	public void ibAccounts_onClick() {
+		Intent intent = new Intent(TransactionEditActivity.this, AccountOverviewActivity.class);
+		startActivity(intent);
+	}
+
+	// btnAccept - edits the current transaction or saves a new one, as required, then returns to
+	// the transaction overview activity.
+	@OnClick(R.id.btnAccept)
+	public void btnAccept_onClick() {
+		if(requestCode == TransactionOverviewActivity.TRANSACTION_EDIT_REQUEST_CODE) { // edit existing
+			queueSaveTransaction(transaction);
+		}
+		else { // add new
+			// TODO validation!
+			queueSaveTransaction(new Transaction());
+		}
+
+		endActivity();
+	}
+
+	// btnCancel - returns to the transaction overview activity without changes.
+	@OnClick(R.id.btnCancel)
+	public void btnCancel_onClick() {
+		endActivity();
+	}
 
     @SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
 	@Override
@@ -70,6 +130,13 @@ public class TransactionEditActivity extends Activity {
         transactionCategoryList = new ArrayList<>();
 
 		ButterKnife.bind(this);
+
+		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				finish();
+			}
+		});
 
 		// show the second account spinner only if transfer type is selected, hide it otherwise
 		spinnerType.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
@@ -92,43 +159,6 @@ public class TransactionEditActivity extends Activity {
 			@Override
 			public void onNothingSelected(AdapterView<?> parent) {
 
-			}
-		});
-
-		etAmount.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-			@Override
-			public void onFocusChange(View v, boolean hasFocus) {
-				if(!hasFocus) {
-					double amount = Double.parseDouble(etAmount.getText().toString());
-					etAmount.setText(new DecimalFormat("#.00").format(amount));
-				}
-			}
-		});
-
-		btn
-
-		// Edits the current transaction or saves a new one, as required, then returns to the
-		// overview activity.
-		btnAccept.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				if(requestCode == TransactionOverviewActivity.TRANSACTION_EDIT_REQUEST_CODE) { // edit existing
-					queueSaveTransaction(transaction);
-				}
-				else { // add new
-					// TODO validation!
-					queueSaveTransaction(new Transaction());
-				}
-
-				endActivity();
-			}
-		});
-
-		// Returns to the main activity without changes.
-		btnCancel.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				endActivity();
 			}
 		});
 

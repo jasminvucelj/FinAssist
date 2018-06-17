@@ -10,4 +10,24 @@
         <item>1</item>
         <item>2</item>
     </integer-array>
+
+    <string-array name="date_labels">
+        <item>Today</item>
+        <item>Yesterday</item>
+        <item>Current week</item>
+        <item>Current month</item>
+        <item>Previous month</item>
+        <item>Last 3 months</item>
+        <item>Current year</item>
+
+    </string-array>
+    <integer-array name="date_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+    </integer-array>
 </resources>

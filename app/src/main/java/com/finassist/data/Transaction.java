@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.Date;
+import java.util.List;
 
 
 public class Transaction implements Serializable {
@@ -15,9 +16,9 @@ public class Transaction implements Serializable {
     public static final int TYPE_EXPENDITURE = 1;
     public static final int TYPE_TRANSFER = 2;
 
+    /*
     public static final Integer[] typeArray = {TYPE_INCOME, TYPE_EXPENDITURE, TYPE_TRANSFER};
 
-    /*
     @Retention(RetentionPolicy.SOURCE)
     @IntDef(value = {TYPE_INCOME, TYPE_EXPENDITURE, TYPE_TRANSFER})
     public @interface TypeDef {}
@@ -110,6 +111,30 @@ public class Transaction implements Serializable {
     public String transferAccountsToString() {
     	if(type != TYPE_TRANSFER) return "";
     	return fromAcc.getName() + " -> " + toAcc.getName();
+	}
+
+	public Transaction clone() {
+    	Transaction newTransaction = new Transaction();
+
+    	newTransaction.id = this.id;
+		newTransaction.type = this.type;
+		newTransaction.fromAcc = this.fromAcc;
+		newTransaction.toAcc = this.toAcc;
+		newTransaction.dateTime = this.dateTime;
+		newTransaction.amount = this.amount;
+		newTransaction.category = this.category;
+		newTransaction.description = this.description;
+
+		return newTransaction;
+	}
+
+	public static void removeTransactionFromList(Transaction transaction, List<Transaction> transactionList) {
+    	for (Transaction t : transactionList) {
+    		if (t.equals(transaction)) {
+    			transactionList.remove(t);
+    			return;
+			}
+		}
 	}
 
     @Override

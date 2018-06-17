@@ -51,11 +51,6 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 		holder.tvName.setText(account.getName());
 		holder.tvDescription.setText(account.getDescription());
 
-		if(holder.tvDescription.getText() == null
-				|| holder.tvDescription.getText().toString().trim().equals("")) {
-			holder.tvDescription.setVisibility(View.GONE);
-		}
-
 		holder.tvBalance.setText(String.format("%.2f", account.getBalance()) + " kn");
 		if(account.getBalance() > 0) {
 			holder.tvBalance.setTextColor(

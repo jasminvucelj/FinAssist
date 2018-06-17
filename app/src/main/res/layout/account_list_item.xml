@@ -3,8 +3,9 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginBottom="8dp"
-    android:layout_marginTop="8dp"
+    android:layout_marginBottom="4dp"
+    android:layout_marginTop="4dp"
+    android:background="@drawable/custom_bg_clickable"
     android:hapticFeedbackEnabled="true"
     android:orientation="horizontal"
     android:paddingLeft="8dp"
@@ -15,6 +16,8 @@
         android:layout_width="0dp"
         android:layout_height="match_parent"
         android:layout_weight="0.35"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:gravity="center"
         android:text="1322.99 kn"
         android:textAlignment="center"
@@ -31,6 +34,8 @@
             android:id="@+id/tvName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Visa Electron"
             android:textColor="@android:color/background_dark"
             android:textSize="18sp" />
@@ -39,6 +44,8 @@
             android:id="@+id/tvDescription"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
             android:text="Zaba liquid account"
             android:textSize="16sp" />
 

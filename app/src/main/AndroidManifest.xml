@@ -23,6 +23,7 @@
         <activity android:name=".activities.HomeActivity" />
         <activity android:name=".activities.AccountOverviewActivity" />
         <activity android:name=".activities.AccountEditActivity" />
+        <activity android:name=".activities.StatisticsActivity"></activity>
     </application>
 
 </manifest>
