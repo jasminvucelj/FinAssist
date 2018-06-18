@@ -14,7 +14,7 @@
         android:background="#ffb7c3c5"
         android:minHeight="?attr/actionBarSize"
         android:theme="?attr/actionBarTheme"
-        app:title="Welcome to FinAssist!" />
+        app:title="@string/message_welcome" />
 
     <RelativeLayout
         android:id="@+id/rlSpotlight"
@@ -236,6 +236,7 @@
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
             android:text="@string/menu_settings"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:visibility="gone" />
     </LinearLayout>
 </LinearLayout>

@@ -53,4 +53,6 @@
     <string name="search_to_account">To account:</string>
     <string name="search_from_account">From account:</string>
     <string name="search_type">Type:</string>
+    <string name="message_welcome">Welcome to FinAssist!</string>
+    <string name="login_remember_me">Remember me</string>
 </resources>

@@ -3,11 +3,14 @@ package com.finassist.activities;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.Toast;
@@ -29,11 +32,11 @@ public class LoginActivity extends Activity {
 
     private FirebaseAuth mAuth;
 
-    private String email = "", password = "", errorText = "";
+    private String email = "", password = "";
 
     private Button btnLogin, btnSignUp;
     private EditText etEmail, etPassword;
-    // private TextView tvError;
+    private CheckBox cbRememberLogin;
     private ProgressBar progressBar;
 
     @SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
@@ -46,13 +49,13 @@ public class LoginActivity extends Activity {
         btnSignUp = findViewById(R.id.btnSignUp);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
-        // tvError = findViewById(R.id.tvError);
+        cbRememberLogin = findViewById(R.id.cbRememberLogin);
         progressBar = findViewById(R.id.progress_bar);
-
-        autoLogin();
 
         //Get Firebase auth instance
         mAuth = FirebaseAuth.getInstance();
+
+        loadLoginData();
 
         /*
          btnLogin - try to authenticate the user with given email & password
@@ -72,6 +75,8 @@ public class LoginActivity extends Activity {
                     showError(String.format(getString(R.string.login_passshort), MIN_PASSWORD_LENGTH));
                     return;
                 }
+
+                saveLoginData(email, password);
 
                 progressBar.setVisibility(View.VISIBLE);
 
@@ -115,6 +120,8 @@ public class LoginActivity extends Activity {
                     return;
                 }
 
+                saveLoginData(email, password);
+
                 progressBar.setVisibility(View.VISIBLE);
 
                 //create user
@@ -139,11 +146,6 @@ public class LoginActivity extends Activity {
 
     }
 
-    private void autoLogin() { // TEST
-        etEmail.setText("jasminvucelj1@gmail.com"); // TEST
-        etPassword.setText("jasmin49"); // TEST
-    }
-
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -163,6 +165,33 @@ public class LoginActivity extends Activity {
 
     private void showError(String errorText) {
         Toast.makeText(this, errorText, Toast.LENGTH_LONG).show();
+    }
+
+    private void saveLoginData(String email, String password) {
+        if(!cbRememberLogin.isChecked()) {
+            email = "";
+            password = "";
+        }
+
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("email", email);
+        editor.putString("password", password);
+        editor.apply();
+
+    }
+
+    private void loadLoginData() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String email = preferences.getString("email", "");
+        String password = preferences.getString("password", "");
+
+        if(!email.equals("") && !password.equals("")) {
+        	cbRememberLogin.setChecked(true);
+		}
+
+        etEmail.setText(email);
+        etPassword.setText(password);
     }
 
 }
