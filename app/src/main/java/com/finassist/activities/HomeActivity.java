@@ -7,10 +7,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
-import android.widget.Toolbar;
 
 import com.finassist.R;
+import com.finassist.data.Account;
+import com.finassist.data.AccountWithBalance;
+import com.finassist.data.CashAccount;
 import com.finassist.data.Transaction;
+import com.finassist.data.TransactionCategory;
 import com.finassist.helpers.FirebaseDatabaseHelper;
 import com.finassist.mock.Mocker;
 import com.finassist.views.TransactionView;
@@ -22,13 +25,18 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 
+import static com.finassist.helpers.FirebaseDatabaseHelper.addTransactionCategories;
+import static com.finassist.helpers.FirebaseDatabaseHelper.dbDummyAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactions;
+import static com.finassist.helpers.FirebaseDatabaseHelper.initTransactionCategories;
+import static com.finassist.helpers.FirebaseDatabaseHelper.readTransactions;
 import static com.finassist.helpers.GraphHelper.graphSpotlightTransactions;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentMonth;
 import static com.finassist.helpers.ObjectListHelper.sortTransactionsByDate;
@@ -98,9 +106,9 @@ public class HomeActivity extends Activity {
 			e.printStackTrace();
 		}
 
-		fetchTransactions();
+		processUser();
 
-		//Mocker.generateMockUserData(currentUserId); // TEST
+
 	}
 
 	/**
@@ -110,11 +118,7 @@ public class HomeActivity extends Activity {
 		dbTransactions.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				transactionList = new ArrayList<>();
-
-				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					transactionList.add(childSnapshot.getValue(Transaction.class));
-				}
+				transactionList = readTransactions(dataSnapshot);
 
 				filterTransactionsByCurrentMonth(transactionList);
 				sortTransactionsByDate(transactionList);
@@ -140,4 +144,32 @@ public class HomeActivity extends Activity {
 			}
 		});
 	}
+
+
+
+	public void processUser() {
+
+		initTransactionCategories();
+
+		dbDummyAccounts.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				if(dataSnapshot.getChildrenCount() == 0) { // simple check if new account
+					FirebaseDatabaseHelper.addDummyAccount(currentUserId);
+					addTransactionCategories(currentUserId);
+				}
+
+				// Mocker.generateMockUserData(currentUserId); // TEST
+
+				fetchTransactions();
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
+
+	}
+
 }

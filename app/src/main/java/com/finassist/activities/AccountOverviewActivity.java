@@ -17,16 +17,14 @@ import android.widget.TextView;
 
 import com.finassist.R;
 import com.finassist.adapters.AccountAdapter;
-import com.finassist.adapters.TransactionAdapter;
 import com.finassist.data.Account;
-import com.finassist.data.Transaction;
+import com.finassist.data.AccountWithBalance;
+import com.finassist.data.CashAccount;
 import com.finassist.helpers.FirebaseDatabaseHelper;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
@@ -36,9 +34,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
-import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactions;
 import static com.finassist.helpers.FirebaseDatabaseHelper.deleteAccount;
-import static com.finassist.helpers.FirebaseDatabaseHelper.deleteTransaction;
+import static com.finassist.helpers.FirebaseDatabaseHelper.readAccounts;
 
 public class AccountOverviewActivity extends Activity
 		implements AccountAdapter.AccountAdapterOnClickHandler {
@@ -82,7 +79,7 @@ public class AccountOverviewActivity extends Activity
 
 		setupViews();
 		setUpSwipeToDelete();
-		fetchTransactions();
+		fetchAccounts();
 	}
 
 	@SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
@@ -95,6 +92,7 @@ public class AccountOverviewActivity extends Activity
 			public void onClick(View v) {
 				Intent intent = new Intent(AccountOverviewActivity.this, AccountEditActivity.class);
 				intent.putExtra("user_id", currentUserId);
+				intent.putExtra("account_type", Account.TYPE_CASH_ACCOUNT);
 				intent.putExtra("request_code", ACCOUNT_CREATE_REQUEST_CODE);
 				startActivityForResult(intent, ACCOUNT_CREATE_REQUEST_CODE);
 			}
@@ -166,6 +164,7 @@ public class AccountOverviewActivity extends Activity
 		Intent intent = new Intent (this, AccountEditActivity.class);
 		intent.putExtra("account", account);
 		intent.putExtra("user_id", currentUserId);
+		intent.putExtra("account_type", account.getType());
 		intent.putExtra("request_code", ACCOUNT_EDIT_REQUEST_CODE);
 		startActivityForResult(intent, ACCOUNT_EDIT_REQUEST_CODE);
 	}
@@ -173,22 +172,17 @@ public class AccountOverviewActivity extends Activity
 	/**
 	 * Fetch all of the user's accounts from the Firebase database.
 	 */
-	public void fetchTransactions() {
+	public void fetchAccounts() {
 		dbAccounts.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				accountList = new ArrayList<>();
-				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					accountList.add(childSnapshot.getValue(Account.class));
-				}
+				accountList = readAccounts(dataSnapshot);
 
 				updateRecyclerView();
 			}
 
 			@Override
-			public void onCancelled(DatabaseError databaseError) {
-
-			}
+			public void onCancelled(DatabaseError databaseError) {}
 		});
 	}
 
@@ -218,7 +212,7 @@ public class AccountOverviewActivity extends Activity
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
-		fetchTransactions();
+		fetchAccounts();
 		updateRecyclerView();
 	}
 }

@@ -20,7 +20,10 @@ import android.widget.TextView;
 import com.finassist.R;
 import com.finassist.adapters.TransactionAdapter;
 import com.finassist.data.Account;
+import com.finassist.data.AccountWithBalance;
+import com.finassist.data.CashAccount;
 import com.finassist.data.Transaction;
+import com.finassist.data.TransactionCategory;
 import com.finassist.helpers.FirebaseDatabaseHelper;
 import com.finassist.views.FilterView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -39,8 +42,12 @@ import static com.finassist.data.Transaction.removeTransactionFromList;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactions;
 import static com.finassist.helpers.FirebaseDatabaseHelper.deleteTransaction;
+import static com.finassist.helpers.FirebaseDatabaseHelper.readAccounts;
+import static com.finassist.helpers.FirebaseDatabaseHelper.readTransactions;
+import static com.finassist.helpers.FirebaseDatabaseHelper.transactionCategories;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByAmount;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByAnyAccount;
+import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCategory;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentMonth;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentWeek;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentYear;
@@ -147,6 +154,7 @@ public class TransactionOverviewActivity extends Activity
 		});
 
 		updateFilterViewDateSpinner();
+		updateFilterViewCategorySpinners();
 		updateFilterViewTypeSpinner();
 	}
 
@@ -160,6 +168,21 @@ public class TransactionOverviewActivity extends Activity
 
 		Spinner spinnerDate = filterView.findViewById(R.id.spinnerDate);
 		spinnerDate.setAdapter(adapterDate);
+	}
+
+	/**
+	 * Populates the "to" and "from" account spinners in the FilterView.
+	 */
+	private void updateFilterViewCategorySpinners() {
+		ArrayAdapter<TransactionCategory> categoryAdapter = new ArrayAdapter<>(
+				this,
+				android.R.layout.simple_spinner_item,
+				transactionCategories);
+
+		categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		Spinner spinnerCategory = filterView.findViewById(R.id.spinnerCategory);
+		spinnerCategory.setAdapter(categoryAdapter);
 	}
 
 	/**
@@ -261,17 +284,10 @@ public class TransactionOverviewActivity extends Activity
 		dbTransactions.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				transactionList = new ArrayList<>();
-				displayedTransactionList = new ArrayList<>();
-
-				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					Transaction transaction = childSnapshot.getValue(Transaction.class);
-					transactionList.add(transaction);
-					displayedTransactionList.add(transaction);
-				}
+				transactionList = readTransactions(dataSnapshot);
 
 				clearSearchParams();
-				updateRecyclerView();
+				filterTransactions();
 			}
 
 			@Override
@@ -288,11 +304,7 @@ public class TransactionOverviewActivity extends Activity
 		dbAccounts.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				accountList = new ArrayList<>();
-				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					Account account = childSnapshot.getValue(Account.class);
-					accountList.add(account);
-				}
+				accountList = readAccounts(dataSnapshot);
 
 				updateFilterViewAccountSpinners();
 			}
@@ -305,7 +317,7 @@ public class TransactionOverviewActivity extends Activity
 	}
 
 
-    /**
+	/**
      * Binds the transaction data to an adapter, and then to the RecyclerView, and shows the RecyclerView,
      * hiding the progress indicator.
      */
@@ -324,7 +336,6 @@ public class TransactionOverviewActivity extends Activity
         	transactionAdapter = new TransactionAdapter(displayedTransactionList,
                     TransactionOverviewActivity.this);
             rvTransactions.setAdapter(transactionAdapter);
-
             rvTransactions.setVisibility(View.VISIBLE);
             progressBar.setVisibility(View.GONE);
 
@@ -348,6 +359,10 @@ public class TransactionOverviewActivity extends Activity
 
 		if(filterView.isDateChecked()) {
 			filterByDates(filterView.getDateSelection());
+		}
+
+		if(filterView.isCategoryChecked()) {
+			filterByCategory(filterView.getCategorySelection());
 		}
 
 		if(filterView.isAmountChecked()) {
@@ -399,6 +414,10 @@ public class TransactionOverviewActivity extends Activity
 				break;
 			}
 		}
+	}
+
+	public void filterByCategory(TransactionCategory category) {
+		displayedTransactionList = filterTransactionsByCategory(displayedTransactionList, category);
 	}
 
 	public void filterByAmounts(double amountMin, double amountMax) {

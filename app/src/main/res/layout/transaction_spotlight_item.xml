@@ -45,7 +45,8 @@
                 android:paddingRight="8dp"
                 android:singleLine="true"
                 android:text="@string/test_transaction_description"
-                android:textSize="14sp" />
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_date"

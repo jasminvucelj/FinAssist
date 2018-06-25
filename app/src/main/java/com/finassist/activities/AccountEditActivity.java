@@ -5,11 +5,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
 
 import com.finassist.R;
 import com.finassist.data.Account;
+import com.finassist.data.AccountWithBalance;
+import com.finassist.data.CashAccount;
 
 import java.text.DecimalFormat;
 
@@ -17,27 +23,41 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
+import butterknife.OnItemSelected;
 
 import static com.finassist.helpers.FirebaseDatabaseHelper.saveAccount;
 
 public class AccountEditActivity extends Activity {
 	private String currentUserId;
 	private int requestCode;
+	private int accountType;
 	private Account account;
 
 	@BindView(R.id.toolbar)
 	Toolbar toolbar;
 	@BindView(R.id.etAccountName)
 	EditText etAccountName;
+	@BindView(R.id.spinnerAccountType)
+	Spinner spinnerAccountType;
+	@BindView(R.id.llBalance)
+	LinearLayout llBalance;
 	@BindView(R.id.etAccountBalance)
 	EditText etAccountBalance;
-	@BindView(R.id.etAccountDescription)
-	EditText etAccountDescription;
 
 	@BindView(R.id.btnAccept)
 	Button btnAccept;
 	@BindView(R.id.btnCancel)
 	Button btnCancel;
+
+	@OnItemSelected(R.id.spinnerAccountType)
+	public void spinnerAccountType_onItemSelected(int position) {
+		if(position == Account.TYPE_CASH_ACCOUNT) {
+			llBalance.setVisibility(View.GONE);
+		}
+		else {
+			llBalance.setVisibility(View.VISIBLE);
+		}
+	}
 
 	@OnFocusChange(R.id.etAccountBalance)
 	public void etAmount_onFocusChange(boolean hasFocus) {
@@ -56,7 +76,12 @@ public class AccountEditActivity extends Activity {
 		}
 		else { // add new
 			// TODO validation!
-			queueSaveAccount(new Account());
+			if(accountType == Account.TYPE_CASH_ACCOUNT) {
+				queueSaveAccount(new CashAccount());
+			}
+			else {
+				queueSaveAccount(new AccountWithBalance());
+			}
 		}
 
 		endActivity();
@@ -82,6 +107,11 @@ public class AccountEditActivity extends Activity {
 			}
 		});
 
+		ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
+				android.R.layout.simple_spinner_dropdown_item,
+				Account.accountTypeLabels);
+		spinnerAccountType.setAdapter(adapter);
+
 		Intent intent = getIntent();
 
 		currentUserId = intent.getStringExtra("user_id");
@@ -89,13 +119,22 @@ public class AccountEditActivity extends Activity {
 		// get rq code - to find out if we're editing an account or creating a new one
 		requestCode = intent.getIntExtra("request_code",
 				TransactionOverviewActivity.TRANSACTION_CREATE_REQUEST_CODE);
+		accountType = intent.getIntExtra("account_type",
+				Account.TYPE_CASH_ACCOUNT);
 
 		// if editing account, get it and display data from that account
 		if (requestCode == TransactionOverviewActivity.TRANSACTION_EDIT_REQUEST_CODE) {
-			account = (Account) intent.getSerializableExtra("account");
+			if(accountType == Account.TYPE_CASH_ACCOUNT) {
+				account = (CashAccount) intent.getSerializableExtra("account");
+				llBalance.setVisibility(View.GONE);
+			}
+			else {
+				account = (AccountWithBalance) intent.getSerializableExtra("account");
+				etAccountBalance.setText(new DecimalFormat("#.00").format(account.getBalance()));
+				llBalance.setVisibility(View.VISIBLE);
+			}
 			etAccountName.setText(account.getName());
-			etAccountBalance.setText(new DecimalFormat("#.00").format(account.getBalance()));
-			etAccountDescription.setText(account.getDescription());
+			spinnerAccountType.setSelection(account.getType());
 		}
 	}
 
@@ -105,8 +144,11 @@ public class AccountEditActivity extends Activity {
 	 */
 	public void queueSaveAccount(Account activeAccount) {
 		activeAccount.setName(etAccountName.getText().toString().trim());
-		activeAccount.setDescription(etAccountDescription.getText().toString().trim());
-		activeAccount.setBalance(Double.parseDouble(etAccountBalance.getText().toString().trim()));
+		activeAccount.setType(spinnerAccountType.getSelectedItemPosition());
+
+		if (activeAccount.getType() != Account.TYPE_CASH_ACCOUNT) {
+			activeAccount.setBalance(Double.parseDouble(etAccountBalance.getText().toString().trim()));
+		}
 		// TODO do not support editing balance of existing account!
 
 		// if id is null the account is new, else save it under its existing id

@@ -38,15 +38,16 @@
             android:maxLines="1"
             android:text="Visa Electron"
             android:textColor="@android:color/background_dark"
-            android:textSize="18sp" />
+            android:textSize="18sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/tvDescription"
+            android:id="@+id/tvAccountType"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:maxLines="1"
-            android:text="Zaba liquid account"
+            android:text="Liquid account"
             android:textSize="16sp" />
 
     </LinearLayout>

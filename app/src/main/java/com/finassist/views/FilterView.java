@@ -13,13 +13,15 @@ import android.widget.Spinner;
 
 import com.finassist.R;
 import com.finassist.data.Account;
+import com.finassist.data.Transaction;
+import com.finassist.data.TransactionCategory;
 
 public class FilterView extends LinearLayout {
 
 	LinearLayout llCollapsed, llExpanded;
 	EditText etAmountMin, etAmountMax;
-	Spinner spinnerDate, spinnerFromAcc, spinnerToAcc, spinnerType;
-	CheckBox cbDate, cbAmount, cbToAcc, cbFromAcc, cbType;
+	Spinner spinnerDate, spinnerCategory, spinnerFromAcc, spinnerToAcc, spinnerType;
+	CheckBox cbDate, cbCategory, cbAmount, cbToAcc, cbFromAcc, cbType;
 
 	public FilterView(Context context) {
 		this(context, null, 0);
@@ -42,11 +44,13 @@ public class FilterView extends LinearLayout {
 		etAmountMax = findViewById(R.id.etAmountMax);
 
 		spinnerDate = findViewById(R.id.spinnerDate);
+		spinnerCategory = findViewById(R.id.spinnerCategory);
 		spinnerFromAcc = findViewById(R.id.spinnerFromAcc);
 		spinnerToAcc = findViewById(R.id.spinnerToAcc);
 		spinnerType = findViewById(R.id.spinnerType);
 
 		cbDate = findViewById(R.id.cbDate);
+		cbCategory = findViewById(R.id.cbCategory);
 		cbAmount = findViewById(R.id.cbAmount);
 		cbToAcc = findViewById(R.id.cbToAcc);
 		cbFromAcc = findViewById(R.id.cbFromAcc);
@@ -70,6 +74,7 @@ public class FilterView extends LinearLayout {
 
 	public void clearSearchParams() {
 		cbDate.setChecked(false);
+		cbCategory.setChecked(false);
 		cbAmount.setChecked(false);
 		cbToAcc.setChecked(false);
 		cbFromAcc.setChecked(false);
@@ -79,6 +84,7 @@ public class FilterView extends LinearLayout {
 		etAmountMax.setText("");
 
 		spinnerDate.setSelection(0);
+		spinnerCategory.setSelection(0);
 		spinnerFromAcc.setSelection(0);
 		spinnerToAcc.setSelection(0);
 		spinnerType.setSelection(0);
@@ -94,6 +100,10 @@ public class FilterView extends LinearLayout {
 
 	public boolean isDateChecked() {
 		return cbDate.isChecked();
+	}
+
+	public boolean isCategoryChecked() {
+		return cbCategory.isChecked();
 	}
 
 	public boolean isAmountChecked() {
@@ -114,6 +124,10 @@ public class FilterView extends LinearLayout {
 
 	public int getDateSelection() {
 		return spinnerDate.getSelectedItemPosition();
+	}
+
+	public TransactionCategory getCategorySelection() {
+		return (TransactionCategory) spinnerCategory.getSelectedItem();
 	}
 
 	public Account getFromAccSelection() {

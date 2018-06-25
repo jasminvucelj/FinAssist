@@ -18,6 +18,8 @@ import android.widget.TextView;
 
 import com.finassist.R;
 import com.finassist.data.Account;
+import com.finassist.data.AccountWithBalance;
+import com.finassist.data.CashAccount;
 import com.finassist.data.Transaction;
 import com.finassist.data.TransactionCategory;
 import com.google.firebase.database.DataSnapshot;
@@ -37,6 +39,7 @@ import butterknife.OnFocusChange;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbDummyAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactionCategories;
+import static com.finassist.helpers.FirebaseDatabaseHelper.readAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.saveTransaction;
 
 public class TransactionEditActivity extends Activity {
@@ -189,17 +192,51 @@ public class TransactionEditActivity extends Activity {
 		int type = spinnerType.getSelectedItemPosition();
 		activeTransaction.setType(type);
 
+		Account tempToAccount, tempFromAccount;
+
 		if(type == Transaction.TYPE_INCOME) {
-			activeTransaction.setToAcc((Account) spinnerFirstAccount.getSelectedItem());
+			tempToAccount = (Account) spinnerFirstAccount.getSelectedItem();
+
+			if(tempToAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
+				activeTransaction.setToAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+			}
+			else {
+				activeTransaction.setToAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+			}
+
 			activeTransaction.setFromAcc(dummyAccount);
 		}
 		else if(type == Transaction.TYPE_EXPENDITURE) {
-			activeTransaction.setFromAcc((Account) spinnerFirstAccount.getSelectedItem());
+			tempFromAccount = (Account) spinnerFirstAccount.getSelectedItem();
+
+			if(tempFromAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
+				activeTransaction.setFromAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+			}
+			else {
+				activeTransaction.setFromAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+			}
+
 			activeTransaction.setToAcc(dummyAccount);
 		}
 		else {
 			activeTransaction.setFromAcc((Account) spinnerFirstAccount.getSelectedItem());
 			activeTransaction.setToAcc((Account) spinnerSecondAccount.getSelectedItem());
+
+			tempFromAccount = (Account) spinnerFirstAccount.getSelectedItem();
+			tempToAccount = (Account) spinnerSecondAccount.getSelectedItem();
+
+			if(tempFromAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
+				activeTransaction.setFromAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+			}
+			else {
+				activeTransaction.setFromAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+			}
+			if(tempToAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
+				activeTransaction.setToAcc((CashAccount) spinnerSecondAccount.getSelectedItem());
+			}
+			else {
+				activeTransaction.setToAcc((AccountWithBalance) spinnerSecondAccount.getSelectedItem());
+			}
 		}
 
 		if(activeTransaction.getDateTime() == null) {
@@ -230,7 +267,7 @@ public class TransactionEditActivity extends Activity {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					dummyAccount = childSnapshot.getValue(Account.class);
+					dummyAccount = childSnapshot.getValue(CashAccount.class);
 				}
 			}
 
@@ -247,9 +284,7 @@ public class TransactionEditActivity extends Activity {
 		dbAccounts.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
 			@Override
 			public void onDataChange(DataSnapshot dataSnapshot) {
-				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
-					accountList.add(childSnapshot.getValue(Account.class));
-				}
+				accountList = readAccounts(dataSnapshot);
 				populateAccountSpinners();
 			}
 

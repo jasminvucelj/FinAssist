@@ -141,7 +141,7 @@
                     android:text="Income this month:" />
 
                 <TextView
-                    android:id="@+id/tvIncomeThisMonth"
+                    android:id="@+id/tvIncomeThisMonthValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="4000.00 kn" />
@@ -161,7 +161,7 @@
                     android:text="Expenditure this month:" />
 
                 <TextView
-                    android:id="@+id/tvExpenditureThisMonth"
+                    android:id="@+id/tvExpenditureThisMonthValue"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="3200.00 kn" />

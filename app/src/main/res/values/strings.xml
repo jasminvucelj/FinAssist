@@ -10,6 +10,7 @@
     <string name="login_empty">Both e-mail and password are required fields.</string>
     <string name="login_authfailed">Authentication failed. Check your entered email and password, and verify you\'re connected to the Internet.</string>
     <string name="account_name">Account name:</string>
+    <string name="account_type">Account type:</string>
     <string name="account_balance">Account balance (kn):</string>
     <string name="transaction_your_account">Your account:</string>
     <string name="transaction_type">Transaction type:</string>
@@ -44,7 +45,7 @@
     <string name="test_transaction_date">23.12.2018. 23:59</string>
     <string name="test_transaction_category">Food</string>
     <string name="test_transaction_account">Visa Electron</string>
-    <string name="search_customize_filters">Click here to customize search filters</string>
+    <string name="search_customize_transaction_filters">Click here to customize filters</string>
     <string name="search_filter_by">Filter by:</string>
     <string name="search_date">Date:</string>
     <string name="search_amount">Amount:</string>
@@ -55,4 +56,6 @@
     <string name="search_type">Type:</string>
     <string name="message_welcome">Welcome to FinAssist!</string>
     <string name="login_remember_me">Remember me</string>
+    <string name="search_click_to_filter">(Click here again to apply filters)</string>
+    <string name="search_category">Category:</string>
 </resources>

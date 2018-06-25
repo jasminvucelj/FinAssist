@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import com.finassist.R;
 import com.finassist.data.Account;
+import com.finassist.data.AccountWithBalance;
 
 import java.util.List;
 
@@ -46,20 +47,26 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
         // - get element from your dataset at this position
         // - replace the contents of the view with that element
 
-        Account account = accountList.get(position);
+		Account account = accountList.get(position);
 
 		holder.tvName.setText(account.getName());
-		holder.tvDescription.setText(account.getDescription());
+		holder.tvAccountType.setText(Account.accountTypeLabels[account.getType()]);
 
-		holder.tvBalance.setText(String.format("%.2f", account.getBalance()) + " kn");
-		if(account.getBalance() > 0) {
-			holder.tvBalance.setTextColor(
-					Resources.getSystem().getColor(android.R.color.holo_green_dark));
+		if(account.getType() != Account.TYPE_CASH_ACCOUNT) {
+			holder.tvBalance.setText(String.format("%.2f", account.getBalance()) + " kn");
+			if(account.getBalance() > 0) {
+				holder.tvBalance.setTextColor(
+						Resources.getSystem().getColor(android.R.color.holo_green_dark));
+			}
+			else {
+				holder.tvBalance.setTextColor(
+						Resources.getSystem().getColor(android.R.color.holo_red_dark));
+			}
 		}
 		else {
-			holder.tvBalance.setTextColor(
-					Resources.getSystem().getColor(android.R.color.holo_red_dark));
+			holder.tvBalance.setText("");
 		}
+
     }
 
     // Return the size of your dataset (invoked by the layout manager)
@@ -74,7 +81,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 	// you provide access to all the views for a data item in a view holder
 	class AccountViewHolder extends RecyclerView.ViewHolder {
 
-    	TextView tvName, tvDescription, tvBalance;
+    	TextView tvName, tvAccountType, tvBalance;
 
 		@SuppressLint("ch.twint.walletapp.lint.debouncedOnClickListener")
 		AccountViewHolder(View itemView) {
@@ -88,9 +95,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.AccountV
 				}
 			});
 
-			tvBalance = itemView.findViewById(R.id.tvBalance);
 			tvName = itemView.findViewById(R.id.tvName);
-			tvDescription = itemView.findViewById(R.id.tvDescription);
+			tvAccountType = itemView.findViewById(R.id.tvAccountType);
+			tvBalance = itemView.findViewById(R.id.tvBalance);
 		}
 
 	}

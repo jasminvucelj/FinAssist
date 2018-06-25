@@ -47,7 +47,8 @@
                 android:ellipsize="end"
                 android:maxLines="1"
                 android:text="@string/test_transaction_description"
-                android:textSize="18sp" />
+                android:textSize="18sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/tv_date"

@@ -3,18 +3,32 @@ package com.finassist.data;
 
 import java.io.Serializable;
 
-public class Account implements Serializable {
-    private String id = null;
-    private String name;
-    private String description;
-    private double balance;
+public abstract class Account implements Serializable {
+	public static final int TYPE_CASH_ACCOUNT = 0;
+	public static final int TYPE_CURRENT_ACCOUNT = 1;
+	public static final int TYPE_GIRO_ACCOUNT = 2;
+	public static final int TYPE_SAVING_ACCOUNT = 3;
+	public static final int TYPE_CREDIT_CARD = 4;
+	public static final int TYPE_DEBIT_CARD = 5;
+
+	public static final String[] accountTypeLabels = {"Cash account",
+			"Current account",
+			"Giro account",
+			"Savings account",
+			"Credit card",
+			"Debit card"
+	};
+
+
+	String id = null;
+	String name;
+	int type;
 
     public Account() {}
 
-    public Account(String name, String description, double balance) {
+    public Account(String name, int type) {
         this.name = name;
-        this.description = description;
-        this.balance = balance;
+        this.type = type;
     }
 
     public String getId() {
@@ -33,37 +47,24 @@ public class Account implements Serializable {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
+	public int getType() {
+		return type;
+	}
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
+	public void setType(int type) {
+		this.type = type;
+	}
 
-    public double getBalance() {
-        return balance;
-    }
+	public abstract double getBalance();
 
-    public void setBalance(double balance) {
-        this.balance = balance;
-    }
+    public abstract void setBalance(double balance);
 
-    @Override
+	@Override
     public String toString() {
         return name;
     }
 
-    public Account clone() {
-    	Account newAccount = new Account();
-
-    	newAccount.id = this.id;
-		newAccount.name = this.name;
-		newAccount.description = this.description;
-		newAccount.balance = this.balance;
-
-		return newAccount;
-	}
+    public abstract void processTransaction(Transaction transaction);
 
 	@Override
 	public boolean equals(Object o) {
@@ -72,20 +73,16 @@ public class Account implements Serializable {
 
 		Account account = (Account) o;
 
-		if (Double.compare(account.balance, balance) != 0) return false;
-		if (id != null ? !id.equals(account.id) : account.id != null) return false;
-		if (!name.equals(account.name)) return false;
-		return description.equals(account.description);
+		if (type != account.type) return false;
+		if (!id.equals(account.id)) return false;
+		return name.equals(account.name);
 	}
 
 	@Override
 	public int hashCode() {
-		int result;
-		long temp;
-		result = name.hashCode();
-		result = 31 * result + description.hashCode();
-		temp = Double.doubleToLongBits(balance);
-		result = 31 * result + (int) (temp ^ (temp >>> 32));
+		int result = id.hashCode();
+		result = 31 * result + name.hashCode();
+		result = 31 * result + type;
 		return result;
 	}
 }
