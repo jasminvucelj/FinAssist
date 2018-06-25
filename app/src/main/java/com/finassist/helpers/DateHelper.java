@@ -28,7 +28,7 @@ public class DateHelper {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(d);
 		calendar.add(Calendar.DATE, -1);
-		return calendar.getTime();
+		return getStartOfDay(calendar.getTime());
 	}
 
 	public static Date getFirstDayOfWeek(Date d) {
@@ -49,7 +49,7 @@ public class DateHelper {
 		Calendar calendar = Calendar.getInstance();
 		calendar.setTime(d);
 		calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH));
-		return getStartOfDay(calendar.getTime());
+		return getEndOfDay(calendar.getTime());
 	}
 
 	public static Date getFirstDayOfPreviousMonth(Date d) {
@@ -74,6 +74,14 @@ public class DateHelper {
 		calendar.add(Calendar.MONTH, -x);
 		calendar.set(Calendar.DAY_OF_MONTH, 1);
 		return getStartOfDay(calendar.getTime());
+	}
+
+	public static Date getLastDayOfEarlierMonth(Date d, int x) {
+		Calendar calendar = Calendar.getInstance();
+		calendar.setTime(d);
+		calendar.add(Calendar.MONTH, -x);
+		calendar.set(Calendar.DAY_OF_MONTH, 1);
+		return getEndOfDay(calendar.getTime());
 	}
 
 	public static Date getFirstDayOfYear(Date d) {

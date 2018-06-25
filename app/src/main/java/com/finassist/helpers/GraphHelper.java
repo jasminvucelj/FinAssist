@@ -2,6 +2,7 @@ package com.finassist.helpers;
 
 import android.content.res.Resources;
 
+import com.finassist.data.Account;
 import com.finassist.data.Transaction;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.XAxis;
@@ -165,6 +166,14 @@ public class GraphHelper {
 		chart.getLegend().setTextSize(Utils.convertDpToPixel(5));
 
 		chart.invalidate();
+	}
+
+	public static void statisticsChart(LineChart chart,
+									   List<Account> accountList,
+									   List<Double[]> startEndValues,
+									   List<List<Transaction>> accountTransactionLists) {
+		// TODO chart
+
 	}
 }
 

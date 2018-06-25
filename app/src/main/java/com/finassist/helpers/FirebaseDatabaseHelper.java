@@ -326,6 +326,25 @@ public class FirebaseDatabaseHelper {
 			return new ArrayList<>();
 		}
 	}
+
+	public static List<Account> readAccountsWithBalance(DataSnapshot dataSnapshot) {
+		try {
+			List<Account> accounts = new ArrayList<>();
+			for (DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+				int accountType = childSnapshot.child("type").getValue(Integer.class);
+
+				if (accountType != Account.TYPE_CASH_ACCOUNT) {
+					AccountWithBalance temp = childSnapshot.getValue(AccountWithBalance.class);
+					accounts.add(temp);
+				}
+			}
+
+			return accounts;
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+			return new ArrayList<>();
+		}
+	}
 	// endregion
 
 }

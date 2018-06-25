@@ -58,4 +58,6 @@
     <string name="login_remember_me">Remember me</string>
     <string name="search_click_to_filter">(Click here again to apply filters)</string>
     <string name="search_category">Category:</string>
+    <string name="search_customize_transaction_filters_secondary">Click here for additional filters</string>
+    <string name="statistics_total_balance">Total balance (all accounts):</string>
 </resources>
