@@ -9,7 +9,7 @@ import java.util.List;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByAnyAccount;
 
 public class AccountBalanceHelper {
-	public static Double[] getAccountBalanceStartEndValues(List<Transaction> transactionList, Account account, Date startDate, Date endDate) {
+	public static Double[] getAccountBalanceStartEndDateValues(List<Transaction> transactionList, Account account, Date startDate, Date endDate) {
 		double startValue;
 		double endValue = account.getBalance();
 

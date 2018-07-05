@@ -60,6 +60,7 @@ import static com.finassist.helpers.ObjectListHelper.filterTransactionsByToAccou
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByToday;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByType;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByYesterday;
+import static com.finassist.helpers.ObjectListHelper.sortTransactionsByDate;
 
 public class TransactionOverviewActivity extends Activity
         implements TransactionAdapter.TransactionAdapterOnClickHandler {
@@ -298,7 +299,7 @@ public class TransactionOverviewActivity extends Activity
 	}
 
 	/**
-	 * Fetch all of the user's transactions from the Firebase database.
+	 * Fetch all of the user's accounts from the Firebase database.
 	 */
 	public void fetchAccounts() {
 		dbAccounts.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -322,6 +323,8 @@ public class TransactionOverviewActivity extends Activity
      * hiding the progress indicator.
      */
     private void updateRecyclerView() {
+    	sortTransactionsByDate(displayedTransactionList, false);
+
 		fab.show();
 		rvTransactions.setVisibility(View.GONE);
 		progressBar.setVisibility(View.VISIBLE);

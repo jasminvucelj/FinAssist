@@ -34,15 +34,8 @@ public class AccountWithBalance extends Account {
 	}
 
 	@Override
-	public void processTransaction(Transaction transaction) {
-		int transactionType = transaction.getType();
-
-		if(transactionType == Transaction.TYPE_EXPENDITURE) {
-			this.setBalance(getBalance() - transaction.getAmount());
-			return;
-		}
-		if(transactionType == Transaction.TYPE_INCOME) {
-			this.setBalance(getBalance() + transaction.getAmount());
-		}
+	public void processTransaction(boolean isLoss, double balanceChange) {
+		if(isLoss) balance -= balanceChange;
+		else balance += balanceChange;
 	}
 }

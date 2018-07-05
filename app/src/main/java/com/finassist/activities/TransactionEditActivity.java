@@ -40,13 +40,15 @@ import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbDummyAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactionCategories;
 import static com.finassist.helpers.FirebaseDatabaseHelper.readAccounts;
+import static com.finassist.helpers.FirebaseDatabaseHelper.saveAccount;
 import static com.finassist.helpers.FirebaseDatabaseHelper.saveTransaction;
 
 public class TransactionEditActivity extends Activity {
 	private String currentUserId;
     private int requestCode;
     private Transaction transaction;
-    private Account dummyAccount;
+    private Account dummyAccount, initialToAccount = null, initialFromAccount = null;
+    private double initialAmount = 0;
 
     private ArrayAdapter<Account> accountAdapter;
 	private ArrayAdapter<TransactionCategory> categoryAdapter;
@@ -110,7 +112,6 @@ public class TransactionEditActivity extends Activity {
 			queueSaveTransaction(transaction);
 		}
 		else { // add new
-			// TODO validation!
 			queueSaveTransaction(new Transaction());
 		}
 
@@ -177,7 +178,10 @@ public class TransactionEditActivity extends Activity {
 		// if editing transaction, get it and display data from that transaction
         if (requestCode == TransactionOverviewActivity.TRANSACTION_EDIT_REQUEST_CODE) {
             transaction = (Transaction) intent.getSerializableExtra("transaction");
-			etAmount.setText(new DecimalFormat("#.00").format(transaction.getAmount()));
+            initialToAccount = transaction.getToAcc();
+			initialFromAccount = transaction.getFromAcc();
+			initialAmount = transaction.getAmount();
+			etAmount.setText(new DecimalFormat("#.00").format(initialAmount));
 			etDescription.setText(transaction.getDescription());
         }
 
@@ -185,7 +189,23 @@ public class TransactionEditActivity extends Activity {
     }
 
 	/**
-	 * Set the data for the new or edited transaction to be added to the database.
+	 * Set the data for the new or edited transaction to be added to the database, and manipulates
+	 * balances of accounts involved in the transaction.
+	 * The algorithm is:
+	 *
+	 * 1. Calculate balance change (full transaction amount for a newly added transaction,
+	 * difference between initial and new amount for edited transaction.
+	 *
+	 * 2. Check type of transaction, get corresponding type(s) of account(s) (only toAcc for income,
+	 * only fromAcc for expenditure, both for transfer).
+	 *
+	 * 3. If account(s) got changed, cancel the transaction for the old one and apply it to the new
+	 * one, else just apply the change.
+	 *
+	 * 4. Save altered account(s) to database.
+	 *
+	 * 5. Save transaction to database.
+	 *
 	 * @param activeTransaction the new or edited transaction.
 	 */
 	public void queueSaveTransaction(Transaction activeTransaction) {
@@ -194,15 +214,37 @@ public class TransactionEditActivity extends Activity {
 
 		Account tempToAccount, tempFromAccount;
 
+		double newAmount = Double.parseDouble(etAmount.getText().toString().trim());
+		activeTransaction.setAmount(newAmount);
+
+		double balanceChange = newAmount - initialAmount;
+
 		if(type == Transaction.TYPE_INCOME) {
 			tempToAccount = (Account) spinnerFirstAccount.getSelectedItem();
 
 			if(tempToAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
-				activeTransaction.setToAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+				tempToAccount = (CashAccount) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setToAcc(tempToAccount);
 			}
 			else {
-				activeTransaction.setToAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+				tempToAccount = (AccountWithBalance) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setToAcc(tempToAccount);
 			}
+
+			if(initialToAccount != null
+					&& !initialToAccount.equals(dummyAccount)
+					&& !tempToAccount.equals(initialToAccount)) {
+				initialToAccount.processTransaction(Account.LOSS, initialAmount);
+				saveAccount(initialToAccount, currentUserId, initialToAccount.getId());
+			}
+
+			if(!tempToAccount.equals(initialToAccount)) {
+				tempToAccount.processTransaction(Account.GAIN, newAmount);
+			}
+			else {
+				tempToAccount.processTransaction(Account.GAIN, balanceChange);
+			}
+			saveAccount(tempToAccount, currentUserId, tempToAccount.getId());
 
 			activeTransaction.setFromAcc(dummyAccount);
 		}
@@ -210,33 +252,84 @@ public class TransactionEditActivity extends Activity {
 			tempFromAccount = (Account) spinnerFirstAccount.getSelectedItem();
 
 			if(tempFromAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
-				activeTransaction.setFromAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+				tempFromAccount = (CashAccount) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setFromAcc(tempFromAccount);
 			}
 			else {
-				activeTransaction.setFromAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+				tempFromAccount = (AccountWithBalance) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setFromAcc(tempFromAccount);
 			}
+
+			if(initialFromAccount != null
+					&& !initialFromAccount.equals(dummyAccount)
+					&& !tempFromAccount.equals(initialFromAccount)) {
+				initialFromAccount.processTransaction(Account.GAIN, initialAmount);
+				saveAccount(initialFromAccount, currentUserId, initialFromAccount.getId());
+			}
+
+			if(!tempFromAccount.equals(initialFromAccount)) {
+				tempFromAccount.processTransaction(Account.LOSS, newAmount);
+			}
+			else {
+				tempFromAccount.processTransaction(Account.LOSS, balanceChange);
+			}
+			saveAccount(tempFromAccount, currentUserId, tempFromAccount.getId());
 
 			activeTransaction.setToAcc(dummyAccount);
 		}
 		else {
-			activeTransaction.setFromAcc((Account) spinnerFirstAccount.getSelectedItem());
-			activeTransaction.setToAcc((Account) spinnerSecondAccount.getSelectedItem());
-
 			tempFromAccount = (Account) spinnerFirstAccount.getSelectedItem();
 			tempToAccount = (Account) spinnerSecondAccount.getSelectedItem();
 
 			if(tempFromAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
-				activeTransaction.setFromAcc((CashAccount) spinnerFirstAccount.getSelectedItem());
+				tempFromAccount = (CashAccount) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setFromAcc(tempFromAccount);
 			}
 			else {
-				activeTransaction.setFromAcc((AccountWithBalance) spinnerFirstAccount.getSelectedItem());
+				tempFromAccount = (AccountWithBalance) spinnerFirstAccount.getSelectedItem();
+				activeTransaction.setFromAcc(tempFromAccount);
 			}
 			if(tempToAccount.getType() == Account.TYPE_CASH_ACCOUNT) {
-				activeTransaction.setToAcc((CashAccount) spinnerSecondAccount.getSelectedItem());
+				tempToAccount = (CashAccount) spinnerSecondAccount.getSelectedItem();
+				activeTransaction.setToAcc(tempToAccount);
 			}
 			else {
-				activeTransaction.setToAcc((AccountWithBalance) spinnerSecondAccount.getSelectedItem());
+				tempToAccount = (AccountWithBalance) spinnerSecondAccount.getSelectedItem();
+				activeTransaction.setToAcc(tempToAccount);
 			}
+
+			if(initialToAccount != null
+					&& !initialToAccount.equals(dummyAccount)
+					&& !tempToAccount.equals(initialToAccount)) {
+				initialToAccount.processTransaction(Account.LOSS, initialAmount);
+				saveAccount(initialToAccount, currentUserId, initialToAccount.getId());
+			}
+			if(initialFromAccount != null
+					&& !initialFromAccount.equals(dummyAccount)
+					&& !tempFromAccount.equals(initialFromAccount)) {
+				initialFromAccount.processTransaction(Account.GAIN, initialAmount);
+				saveAccount(initialFromAccount, currentUserId, initialFromAccount.getId());
+			}
+
+			if(!tempFromAccount.equals(initialFromAccount)) {
+				tempFromAccount.processTransaction(Account.LOSS, newAmount);
+			}
+			else {
+				tempFromAccount.processTransaction(Account.LOSS, balanceChange);
+			}
+
+			if(!tempToAccount.equals(initialToAccount)) {
+				tempToAccount.processTransaction(Account.GAIN, newAmount);
+			}
+			else {
+				tempToAccount.processTransaction(Account.GAIN, balanceChange);
+			}
+
+			saveAccount(tempFromAccount, currentUserId, tempFromAccount.getId());
+			saveAccount(tempToAccount, currentUserId, tempToAccount.getId());
+
+			activeTransaction.setFromAcc(tempFromAccount);
+			activeTransaction.setToAcc(tempToAccount);
 		}
 
 		if(activeTransaction.getDateTime() == null) {
@@ -245,8 +338,8 @@ public class TransactionEditActivity extends Activity {
 
 		activeTransaction.setCategory((TransactionCategory) spinnerCategory.getSelectedItem());
 
-		activeTransaction.setAmount(Double.parseDouble(etAmount.getText().toString().trim()));
 		activeTransaction.setDescription(etDescription.getText().toString().trim());
+
 
 		// if id is null the transaction is new, else save it under its existing id
 		if(activeTransaction.getId() == null) {

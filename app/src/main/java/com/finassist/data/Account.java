@@ -11,6 +11,10 @@ public abstract class Account implements Serializable {
 	public static final int TYPE_CREDIT_CARD = 4;
 	public static final int TYPE_DEBIT_CARD = 5;
 
+	public static final boolean LOSS = true;
+	public static final boolean GAIN = false;
+
+
 	public static final String[] accountTypeLabels = {"Cash account",
 			"Current account",
 			"Giro account",
@@ -64,7 +68,7 @@ public abstract class Account implements Serializable {
         return name;
     }
 
-    public abstract void processTransaction(Transaction transaction);
+	public abstract void processTransaction(boolean isLoss, double balanceChange);
 
 	@Override
 	public boolean equals(Object o) {

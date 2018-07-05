@@ -16,6 +16,18 @@
         android:theme="?attr/actionBarTheme"
         app:title="@string/message_welcome" />
 
+    <ProgressBar
+        android:id="@+id/progressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:paddingBottom="60dp"
+        android:paddingLeft="64dp"
+        android:paddingRight="64dp"
+        android:paddingTop="60dp"
+        android:visibility="gone" />
+
     <RelativeLayout
         android:id="@+id/rlSpotlight"
         android:layout_width="match_parent"
@@ -71,10 +83,10 @@
             android:id="@+id/spotlightChart"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_marginBottom="24dp"
+            android:layout_marginBottom="16dp"
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
-            android:layout_marginTop="24dp">
+            android:layout_marginTop="16dp">
 
         </com.github.mikephil.charting.charts.LineChart>
 
@@ -197,20 +209,6 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/btnStatistics"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="2dp"
-            android:layout_marginTop="2dp"
-            android:drawableLeft="@drawable/ic_statistics"
-            android:drawablePadding="10dp"
-            android:gravity="left|center"
-            android:paddingBottom="10dp"
-            android:paddingTop="10dp"
-            android:text="@string/menu_statistics"
-            android:textSize="16sp" />
-
-        <Button
             android:id="@+id/btnTransactionAccounts"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -225,18 +223,18 @@
             android:textSize="16sp" />
 
         <Button
-            android:id="@+id/btnSettings"
+            android:id="@+id/btnStatistics"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:layout_marginTop="2dp"
-            android:drawableLeft="@drawable/ic_settings"
+            android:drawableLeft="@drawable/ic_statistics"
             android:drawablePadding="10dp"
             android:gravity="left|center"
             android:paddingBottom="10dp"
             android:paddingTop="10dp"
-            android:text="@string/menu_settings"
-            android:textSize="16sp"
-            android:visibility="gone" />
+            android:text="@string/menu_statistics"
+            android:textSize="16sp" />
+
     </LinearLayout>
 </LinearLayout>

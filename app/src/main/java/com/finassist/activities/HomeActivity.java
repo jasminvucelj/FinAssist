@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
 import com.finassist.R;
@@ -38,7 +39,9 @@ import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactions;
 import static com.finassist.helpers.FirebaseDatabaseHelper.initTransactionCategories;
 import static com.finassist.helpers.FirebaseDatabaseHelper.readTransactions;
 import static com.finassist.helpers.GraphHelper.graphSpotlightTransactions;
+import static com.finassist.helpers.ObjectListHelper.filterLastXTransactions;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentMonth;
+import static com.finassist.helpers.ObjectListHelper.filterTransactionsByType;
 import static com.finassist.helpers.ObjectListHelper.sortTransactionsByDate;
 
 public class HomeActivity extends Activity {
@@ -49,6 +52,9 @@ public class HomeActivity extends Activity {
 
 	@BindView(R.id.rlSpotlight)
 	RelativeLayout rlSpotlight;
+
+	@BindView(R.id.progressBar)
+	ProgressBar progressBar;
 
 	@BindView(R.id.lastTransactionSpotlight)
 	TransactionView lastTransactionSpotlight;
@@ -64,9 +70,6 @@ public class HomeActivity extends Activity {
 
 	@BindView(R.id.btnTransactionAccounts)
 	Button btnTransactionAccounts;
-
-	@BindView(R.id.btnSettings)
-	Button btnSettings;
 
 	@OnClick(R.id.btnTransactionOverview)
 	public void btnTransactionOverview_onClick() {
@@ -95,7 +98,8 @@ public class HomeActivity extends Activity {
 
 		ButterKnife.bind(this);
 
-		rlSpotlight.setVisibility(View.INVISIBLE);
+		rlSpotlight.setVisibility(View.GONE);
+		progressBar.setVisibility(View.VISIBLE);
 
 		FirebaseAuth mAuth = FirebaseAuth.getInstance();
 
@@ -107,12 +111,10 @@ public class HomeActivity extends Activity {
 		}
 
 		processUser();
-
-
 	}
 
 	/**
-	 * Fetch all of the user's transactions from the Firebase database.
+	 * Fetch the transactions for the spotlight display.
 	 */
 	public void fetchTransactions() {
 		dbTransactions.child(currentUserId).addListenerForSingleValueEvent(new ValueEventListener() {
@@ -120,21 +122,26 @@ public class HomeActivity extends Activity {
 			public void onDataChange(DataSnapshot dataSnapshot) {
 				transactionList = readTransactions(dataSnapshot);
 
-				filterTransactionsByCurrentMonth(transactionList);
-				sortTransactionsByDate(transactionList);
+				if(transactionList.size() > 0) {
+					sortTransactionsByDate(transactionList);
+					spotlightTransaction = transactionList.get(transactionList.size() - 1);
 
-				if(transactionList.isEmpty()) {
+					transactionList= filterTransactionsByType(transactionList, Transaction.TYPE_EXPENDITURE);
+					transactionList = filterLastXTransactions(transactionList, 10);
+
+					if (transactionList.isEmpty()) {
+						rlSpotlight.setVisibility(View.VISIBLE);
+						progressBar.setVisibility(View.GONE);
+						return;
+					}
+
+					graphSpotlightTransactions(spotlightChart, transactionList);
+
+					lastTransactionSpotlight.setData(spotlightTransaction, currentUserId);
+
 					rlSpotlight.setVisibility(View.VISIBLE);
-					return;
+					progressBar.setVisibility(View.GONE);
 				}
-
-				spotlightTransaction = transactionList.get(transactionList.size() - 1);
-
-				graphSpotlightTransactions(spotlightChart, transactionList);
-
-				lastTransactionSpotlight.setData(spotlightTransaction, currentUserId);
-
-				rlSpotlight.setVisibility(View.VISIBLE);
 
 			}
 
@@ -159,7 +166,7 @@ public class HomeActivity extends Activity {
 					addTransactionCategories(currentUserId);
 				}
 
-				// Mocker.generateMockUserData(currentUserId); // TEST
+				//Mocker.generateMockUserData(currentUserId); // TEST
 
 				fetchTransactions();
 			}
@@ -173,3 +180,5 @@ public class HomeActivity extends Activity {
 	}
 
 }
+
+// TODO expenditure/income this month

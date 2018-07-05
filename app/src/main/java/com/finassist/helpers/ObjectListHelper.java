@@ -126,7 +126,7 @@ public class ObjectListHelper {
 		List<Transaction> filteredList = new ArrayList<>();
 
 		for (Transaction transaction : transactions) {
-			double transactionType = transaction.getType();
+			int transactionType = transaction.getType();
 			if (transactionType == type) {
 				filteredList.add(transaction);
 			}
@@ -253,4 +253,10 @@ public class ObjectListHelper {
 	}
 
 	//endregion
+
+	public static List<Transaction> filterLastXTransactions(
+			List<Transaction> transactions, int x) {
+		sortTransactionsByDate(transactions);
+		return transactions.subList(Math.max(transactions.size() - x, 0), transactions.size());
+	}
 }

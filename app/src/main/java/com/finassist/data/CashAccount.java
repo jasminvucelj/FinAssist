@@ -30,5 +30,5 @@ public class CashAccount extends Account {
 	}
 
 	@Override
-	public void processTransaction(Transaction transaction) {}
+	public void processTransaction(boolean isLoss, double balanceChange) {}
 }

@@ -62,6 +62,19 @@ public class TransactionCategory implements Serializable {
 	}
 
 	@Override
+	public String toString() {
+		if (parent == null) {
+			return name;
+		}
+
+		StringBuilder sb = new StringBuilder();
+		sb.append(parent.getName() + " - " + name);
+
+		return sb.toString();
+	}
+
+	/*
+	@Override
     public String toString() {
         if (parent == null) {
             return name;
@@ -82,4 +95,5 @@ public class TransactionCategory implements Serializable {
 
         return sb.toString();
     }
+    */
 }

@@ -36,49 +36,57 @@ public class FirebaseDatabaseHelper {
 
     //region SAVE
 
-    public static void saveTransaction(Transaction transaction, String userId) {
+    public static String saveTransaction(Transaction transaction, String userId) {
         String objectId = dbTransactions.child(userId).push().getKey();
         transaction.setId(objectId);
         dbTransactions.child(userId).child(objectId).setValue(transaction);
-    }
-
-
-	public static void saveTransaction(Transaction transaction, String userId, String objectId) {
-		dbTransactions.child(userId).child(objectId).setValue(transaction);
+		return objectId;
 	}
 
 
-    public static void saveAccount(Account account, String userId) {
+	public static String saveTransaction(Transaction transaction, String userId, String objectId) {
+		dbTransactions.child(userId).child(objectId).setValue(transaction);
+		return objectId;
+	}
+
+
+    public static String saveAccount(Account account, String userId) {
         String objectId = dbAccounts.child(userId).push().getKey();
         account.setId(objectId);
         dbAccounts.child(userId).child(objectId).setValue(account);
+        return objectId;
     }
 
 
-	public static void saveAccount(Account account, String userId, String objectId) {
-		dbAccounts.child(userId).child(objectId).setValue(account);
+	public static String saveAccount(Account account, String userId, String objectId) {
+    	dbAccounts.child(userId).child(objectId).setValue(account);
+    	return objectId;
 	}
 
 
-    public static void addDummyAccount(String userId) {
+    public static String addDummyAccount(String userId) {
     	dummyAccount = new CashAccount("DUMMY_EXPENDITURE_ACC");
 		String objectId = dbDummyAccounts.child(userId).push().getKey();
 		dummyAccount.setId(objectId);
         dbDummyAccounts.child(userId).child(objectId).setValue(dummyAccount);
-    }
+		return objectId;
+
+	}
 
 
-    public static void saveTransactionCategory(TransactionCategory transactionCategory, String userId) {
+    public static String saveTransactionCategory(TransactionCategory transactionCategory, String userId) {
         String objectId = dbTransactionCategories.child(userId).push().getKey();
         transactionCategory.setId(objectId);
         dbTransactionCategories.child(userId).child(objectId).setValue(transactionCategory);
-    }
+		return objectId;
+	}
 
 
-	public static void saveTransactionCategory(TransactionCategory transactionCategory,
+	public static String saveTransactionCategory(TransactionCategory transactionCategory,
 											   String userId,
 											   String objectId) {
 		dbTransactionCategories.child(userId).child(objectId).setValue(transactionCategory);
+		return objectId;
 	}
 
     //endregion
@@ -86,11 +94,80 @@ public class FirebaseDatabaseHelper {
 	// region DELETE
 
 	public static void deleteTransaction(Transaction transaction, String userId) {
-		dbTransactions.child(userId).child(transaction.getId()).removeValue(); // TODO change account balances!
+		deleteTransactionWithDeletedAccount(transaction, userId, null);
 	}
 
-	public static void deleteAccount(Account account, String userId) { // TODO also delete transactions!
+	/**
+	 * Deletes a transaction, updating the balances of existing accounts accordingly, ignoring the
+	 * account whose deletion prompted the deletion of the transaction in the first place, if any.
+	 * @param transaction transaction to be deleted.
+	 * @param userId database id of current user.
+	 * @param deletedAccount account whose deletion prompted the deletion of the transaction; it
+	 *                          is to be ignored when updating account balances post-transaction deletion
+	 */
+	public static void deleteTransactionWithDeletedAccount(Transaction transaction, String userId, Account deletedAccount) {
+		dbTransactions.child(userId).child(transaction.getId()).removeValue();
+
+		Account account;
+		if(transaction.getType() == Transaction.TYPE_INCOME
+				&& transaction.getToAcc().getType() != Account.TYPE_CASH_ACCOUNT) {
+			account = transaction.getToAcc();
+			if (deletedAccount == null && !account.equals(deletedAccount)) {
+				account.setBalance(account.getBalance() - transaction.getAmount());
+				saveAccount(account, userId, account.getId());
+			}
+			return;
+		}
+		if(transaction.getType() == Transaction.TYPE_EXPENDITURE
+				&& transaction.getFromAcc().getType() != Account.TYPE_CASH_ACCOUNT) {
+			account = transaction.getFromAcc();
+			if (deletedAccount == null && !account.equals(deletedAccount)) {
+				account.setBalance(account.getBalance() + transaction.getAmount());
+				saveAccount(account, userId, account.getId());
+			}
+			return;
+		}
+		if(transaction.getType() == Transaction.TYPE_TRANSFER) {
+			if(transaction.getToAcc().getType() != Account.TYPE_CASH_ACCOUNT) {
+				account = transaction.getToAcc();
+				if (deletedAccount == null && !account.equals(deletedAccount)) {
+					account.setBalance(account.getBalance() - transaction.getAmount());
+					saveAccount(account, userId, account.getId());
+				}
+			}
+			if(transaction.getFromAcc().getType() != Account.TYPE_CASH_ACCOUNT) {
+				account = transaction.getFromAcc();
+				if (deletedAccount == null && !account.equals(deletedAccount)) {
+					account.setBalance(account.getBalance() + transaction.getAmount());
+					saveAccount(account, userId, account.getId());
+				}
+			}
+		}
+	}
+
+	public static void deleteAccount(Account account, String userId) {
+		if(account == null) {
+			return;
+		}
+		
 		dbAccounts.child(userId).child(account.getId()).removeValue();
+
+		dbTransactions.child(userId).addListenerForSingleValueEvent(new ValueEventListener() {
+			@Override
+			public void onDataChange(DataSnapshot dataSnapshot) {
+				for(DataSnapshot childSnapshot : dataSnapshot.getChildren()) {
+					Transaction transaction = childSnapshot.getValue(Transaction.class);
+					if(account.equals(transaction.getFromAcc()) || account.equals(transaction.getToAcc())) {
+						deleteTransactionWithDeletedAccount(transaction, userId, account);
+					}
+				}
+			}
+
+			@Override
+			public void onCancelled(DatabaseError databaseError) {
+
+			}
+		});
 	}
 
 	// endregion
@@ -152,7 +229,7 @@ public class FirebaseDatabaseHelper {
 
 		TransactionCategory tcHealthcare = new TransactionCategory("Healthcare"); // 42
 		transactionCategories.add(tcHealthcare);
-		transactionCategories.add(new TransactionCategory("Health insurance", tcHealthcare)); // 37
+		transactionCategories.add(new TransactionCategory("Health insurance", tcHealthcare));
 		transactionCategories.add(new TransactionCategory("Life insurance", tcHealthcare));
 		transactionCategories.add(new TransactionCategory("Appointments", tcHealthcare));
 		transactionCategories.add(new TransactionCategory("Hospital stays", tcHealthcare));

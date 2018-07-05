@@ -5,21 +5,19 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
 import android.widget.CompoundButton;
-import android.widget.Filter;
 import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.finassist.R;
 import com.finassist.data.Account;
 import com.finassist.data.Transaction;
+import com.finassist.data.TransactionCategory;
 import com.finassist.helpers.AccountBalanceHelper;
 import com.finassist.helpers.FirebaseDatabaseHelper;
 import com.finassist.views.AccountCheckBox;
@@ -50,22 +48,16 @@ import static com.finassist.helpers.DateHelper.getStartOfDay;
 import static com.finassist.helpers.DateHelper.getYesterday;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.dbTransactions;
-import static com.finassist.helpers.FirebaseDatabaseHelper.readAccounts;
 import static com.finassist.helpers.FirebaseDatabaseHelper.readAccountsWithBalance;
 import static com.finassist.helpers.FirebaseDatabaseHelper.readTransactions;
-import static com.finassist.helpers.GraphHelper.graphSpotlightTransactions;
+import static com.finassist.helpers.FirebaseDatabaseHelper.transactionCategories;
 import static com.finassist.helpers.GraphHelper.statisticsChart;
-import static com.finassist.helpers.GraphHelper.statisticsGraph1;
-import static com.finassist.helpers.GraphHelper.statisticsGraph2;
+import static com.finassist.helpers.ObjectListHelper.filterTransactionsByAmount;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByAnyAccount;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentMonth;
+import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCategory;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentWeek;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByCurrentYear;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByLastXMonths;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByPreviousMonth;
 import static com.finassist.helpers.ObjectListHelper.filterTransactionsByStartEndDate;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByToday;
-import static com.finassist.helpers.ObjectListHelper.filterTransactionsByYesterday;
+import static com.finassist.helpers.ObjectListHelper.filterTransactionsByType;
 
 public class StatisticsActivity extends Activity {
 	private String currentUserId;
@@ -118,7 +110,7 @@ public class StatisticsActivity extends Activity {
 		ButterKnife.bind(this);
 
 		progressBar.setVisibility(View.VISIBLE);
-		svMain.setVisibility(View.GONE);
+		svMain.setVisibility(View.INVISIBLE);
 
 		toolbar.setNavigationOnClickListener(new View.OnClickListener() {
 			@Override
@@ -162,6 +154,18 @@ public class StatisticsActivity extends Activity {
 				getResources().getStringArray(R.array.date_labels));
 
 		spinnerTime.setAdapter(adapterDate);
+
+		spinnerTime.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+			@Override
+			public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+				prepareDataAndDrawChart();
+			}
+
+			@Override
+			public void onNothingSelected(AdapterView<?> parent) {
+
+			}
+		});
 	}
 
 
@@ -236,10 +240,40 @@ public class StatisticsActivity extends Activity {
 			progressBar.setVisibility(View.GONE);
 			svMain.setVisibility(View.VISIBLE);
 		}
+
+		updateFilterViewCategorySpinners();
+		updateFilterViewTypeSpinner();
+	}
+
+	/**
+	 * Populates the "to" and "from" account spinners in the FilterView.
+	 */
+	private void updateFilterViewCategorySpinners() {
+		ArrayAdapter<TransactionCategory> categoryAdapter = new ArrayAdapter<>(
+				this,
+				android.R.layout.simple_spinner_item,
+				transactionCategories);
+
+		categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+		Spinner spinnerCategory = filterView1.findViewById(R.id.spinnerCategory);
+		spinnerCategory.setAdapter(categoryAdapter);
+	}
+
+	/**
+	 * Populates the type spinner in the FilterView.
+	 */
+	private void updateFilterViewTypeSpinner() {
+		ArrayAdapter<String> adapterType = new ArrayAdapter<>(this,
+				android.R.layout.simple_spinner_dropdown_item,
+				getResources().getStringArray(R.array.type_labels));
+
+		Spinner spinnerType = filterView1.findViewById(R.id.spinnerType);
+		spinnerType.setAdapter(adapterType);
 	}
 
 	private void prepareDataAndDrawChart() {
-		List<Double[]> startEndValues = new ArrayList<>();
+		List<Double[]> startEndValues = new ArrayList<>(); // the beginning and end balance for each selected account
 		Date startDate = getStartDate();
 		Date endDate = getEndDate();
 
@@ -247,7 +281,7 @@ public class StatisticsActivity extends Activity {
 
 		// get start/end balance values for all accounts
 		for(Account account : selectedAccounts) {
-			startEndValues.add(AccountBalanceHelper.getAccountBalanceStartEndValues(transactionList,
+			startEndValues.add(AccountBalanceHelper.getAccountBalanceStartEndDateValues(transactionList,
 					account, startDate, endDate));
 
 			List<Transaction> tempTransactionslist = new ArrayList<>();
@@ -264,30 +298,25 @@ public class StatisticsActivity extends Activity {
 			tempTransactionslist = filterTransactionsByStartEndDate(tempTransactionslist,
 					startDate, endDate);
 
-			// TODO filterview, more filtering
-			/*
-			if(filterView.isCategoryChecked()) {
-				filterByCategory(filterView.getCategorySelection());
+			if(filterView1.isCategoryChecked()) {
+				tempTransactionslist = filterTransactionsByCategory(
+						tempTransactionslist, filterView1.getCategorySelection());
 			}
 
-			if(filterView.isAmountChecked()) {
-				filterByAmounts(filterView.getAmountMin(), filterView.getAmountMax());
+			if(filterView1.isAmountChecked()) {
+				tempTransactionslist = filterTransactionsByAmount(
+						tempTransactionslist, filterView1.getAmountMin(), filterView1.getAmountMax());
 			}
 
-			if(filterView.isFromAccChecked() || filterView.isToAccChecked()) {
-				filterByAccount(filterView.getFromAccSelection(), filterView.getToAccSelection());
+			if(filterView1.isTypeChecked()) {
+				tempTransactionslist = filterTransactionsByType(
+						tempTransactionslist, filterView1.getTypeSelection());
 			}
-
-			if(filterView.isTypeChecked()) {
-				filterByType(filterView.getTypeSelection());
-			}
-			*/
 
 			selectedTransactionsLists.add(tempTransactionslist);
-
 		}
 
-
+		chart1.setVisibility(View.VISIBLE);
 		statisticsChart(chart1, selectedAccounts, startEndValues, selectedTransactionsLists);
 	}
 
@@ -336,7 +365,7 @@ public class StatisticsActivity extends Activity {
 		Date date;
 
 		if(spinnerTime.getSelectedItemPosition() == 4) {
-			date = getLastDayOfEarlierMonth(Calendar.getInstance().getTime(), 3);
+			date = getLastDayOfEarlierMonth(Calendar.getInstance().getTime(), 1);
 		}
 		else {
 			date = getEndOfDay(Calendar.getInstance().getTime());
